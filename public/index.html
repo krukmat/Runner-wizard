@@ -192,6 +192,7 @@
                           };
                            map.setCenter(pos);
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                           map.clearOverlays();
                            marker = new google.maps.Marker({position:latLong, map: map});
                            find_closest_marker(pos);
                         }, function() {
