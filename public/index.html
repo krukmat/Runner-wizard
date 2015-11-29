@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-    <meta http-equiv="refresh" content="30" />
     <meta charset="UTF-8">
+    <META HTTP-EQUIV="refresh" CONTENT="30">
     <title></title>
     <style type="text/css">
         html, body { height: 100%; margin: 0; padding: 0; }
@@ -86,7 +86,7 @@
                   }];
 
                   // Load the Visualization API and the piechart package.
-                  google.load("visualization", "1", {packages: ["columnchart"]});
+                  google.load("visualization", "1", {packages: ["corechart"]});
 
                   // Set a callback to run when the Google Visualization API is loaded.
                   google.setOnLoadCallback(initialize);
@@ -139,6 +139,28 @@
                       icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
                     });
                     markers.push(mousemarker);
+
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'Ejemplo');
+                    data.addColumn('number', 'Altura');
+                    data.addColumn({type: 'string', role: 'style'});
+
+                    for (var i = 0; i < elevations.length; i++) {
+                        if (i<closest)
+                            data.addRow(['', elevations[i].elevation, 'color: #00ff00']);
+                        else
+                            data.addRow(['', elevations[i].elevation, 'color: #ff0000']);
+                    }
+
+                    document.getElementById('chart_div').style.display = 'block';
+                    chart.draw(data, {
+                     // width: 512,
+                      height: 250,
+                      legend: 'none',
+                      titleY: 'Altura en metros',
+                      focusBorderColor: '#00ff00'
+                    });
+
                     chart.setSelection([]);
                     chart.setSelection([{column:1,row:closest+1}]);
                     console.log(closest);
@@ -163,22 +185,6 @@
                       strokeColor: "#FF0000",
                       map: map});
 
-
-                    var data = new google.visualization.DataTable();
-                    data.addColumn('string', 'Ejemplo');
-                    data.addColumn('number', 'Altura');
-                    for (var i = 0; i < results.length; i++) {
-                      data.addRow(['', elevations[i].elevation]);
-                    }
-
-                    document.getElementById('chart_div').style.display = 'block';
-                    chart.draw(data, {
-                     // width: 512,
-                      height: 250,
-                      legend: 'none',
-                      titleY: 'Altura en metros',
-                      focusBorderColor: '#00ff00'
-                    });
 
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(function(position) {
