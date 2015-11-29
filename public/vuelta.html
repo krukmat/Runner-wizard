@@ -19,6 +19,7 @@
                   // TODO: Que se pueda definir nuevas rutas tomando puntos seleccionados por el usuario.
                   var map = null;
                   var chart = null;
+                  var ida = true;
 
                   var geocoderService = null;
                   var elevationService = null;
@@ -106,6 +107,12 @@
                     map = new google.maps.Map(document.getElementById("map"), myOptions);
                     chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
 
+                    var centerControlDiv = document.createElement('div');
+                    var centerControl = new BackButton(centerControlDiv, map);
+
+                    centerControlDiv.index = 1;
+                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+
                     geocoderService = new google.maps.Geocoder();
                     elevationService = new google.maps.ElevationService();
                     directionsService = new google.maps.DirectionsService();
@@ -132,15 +139,59 @@
                            find_closest_marker(pos);
                   }
 
+                  function BackButton(controlDiv, map) {
+
+                      // Set CSS for the control border.
+                      var controlUI = document.createElement('div');
+                      controlUI.style.backgroundColor = '#fff';
+                      controlUI.style.border = '2px solid #fff';
+                      controlUI.style.borderRadius = '3px';
+                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                      controlUI.style.cursor = 'pointer';
+                      controlUI.style.marginBottom = '22px';
+                      controlUI.style.textAlign = 'center';
+                      controlUI.title = 'Ida';
+                      controlDiv.appendChild(controlUI);
+
+                      // Set CSS for the control interior.
+                      var controlText = document.createElement('div');
+                      controlText.style.color = 'rgb(25,25,25)';
+                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      controlText.style.fontSize = '16px';
+                      controlText.style.lineHeight = '38px';
+                      controlText.style.paddingLeft = '5px';
+                      controlText.style.paddingRight = '5px';
+                      controlText.innerHTML = 'Ida';
+                      controlUI.appendChild(controlText);
+
+                      // Setup the click event listeners: simply set the map to Chicago.
+                      controlUI.addEventListener('click', function() {
+                          if (ida) {
+                            controlText.innerHTML = 'Vuelta';
+                          } else {
+                            controlText.innerHTML = 'Ida';
+                          }
+                          ida = (!ida);
+                      });
+
+                    }
+
                   function rad(x) {return x*Math.PI/180;}
 
-                  function find_closest_marker( pos ) {
+                  function find_closest_marker( pos, ida ) {
                     var lat = pos.lat;
                     var lng = pos.lng;
                     var R = 6371; // radius of earth in km
                     var distances = [];
                     var closest = -1;
-                    for( var i = 128; i < elevations.length; i++ ) {
+                    var init = 0;
+                    var end = elevations.length;
+                    if (ida) {
+                        end = 128; //TODO: Usuario debe definir el punto de vuelta
+                    } else {
+                        init = 128; //TODO: Usuario debe definir el punto de vuelta
+                    }
+                    for( var i = init; i < end; i++ ) {
                         var mlat = elevations[i].location.lat();
                         var mlng = elevations[i].location.lng();
                         var dLat  = rad(mlat - lat);
@@ -207,10 +258,13 @@
                       strokeColor: "#FF0000",
                       map: map});
 
-                    //TODO: navigator.geolocation.watchPosition
                     if (navigator.geolocation) {
-                        //navigator.geolocation.getCurrentPosition(updatePosition, failureGetPosition);
-                        navigator.geolocation.watchPosition(updatePosition, failureGetPosition);
+                        var options = {
+                              enableHighAccuracy: false,
+                              timeout: 5000,
+                              maximumAge: 0
+                        };
+                        navigator.geolocation.watchPosition(updatePosition, failureGetPosition, options);
                       } else {
                         // Browser doesn't support Geolocation
                         var infoWindow = new google.maps.InfoWindow({map: map});
