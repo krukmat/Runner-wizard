@@ -14,7 +14,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script>
         // JavaScript Document
-
+                  // TODO: Ida y vuelta integrarlo en un solo script. Boton para definir si es ida o vuelta? Definir punto de vuelta?
+                  // TODO: Mapa que sea optativo para mostrar
+                  // TODO: Recomendacion online segun altura del tipo de carrera: rapido, loma, constante, ...
+                  // TODO: Que se pueda definir nuevas rutas tomando puntos seleccionados por el usuario.
                   var map = null;
                   var chart = null;
 
@@ -27,6 +30,7 @@
                   var polyline = null;
                   var elevations = null;
 
+                  // TODO: Configurable. Asi se puede hacer de cualquier lado
                   var SAMPLES = 256;
 
                   var examples = [{
@@ -186,7 +190,7 @@
                       strokeColor: "#FF0000",
                       map: map});
 
-
+                    //TODO: navigator.geolocation.watchPosition
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(function(position) {
                           //reset();
