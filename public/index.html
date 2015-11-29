@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
+    <meta http-equiv="refresh" content="30" />
     <meta charset="UTF-8">
     <title></title>
     <style type="text/css">
@@ -118,8 +119,8 @@
                     var distances = [];
                     var closest = -1;
                     for( var i = 0; i < elevations.length; i++ ) {
-                        var mlat = elevations[i].location.lat;
-                        var mlng = elevations[i].location.lng;
+                        var mlat = elevations[i].location.lat();
+                        var mlng = elevations[i].location.lng();
                         var dLat  = rad(mlat - lat);
                         var dLong = rad(mlng - lng);
                         var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -132,8 +133,15 @@
                         }
                     }
                     // chart.setSelection(['', elevations[closest].elevation]);
+                    mousemarker = new google.maps.Marker({
+                      position: elevations[closest].location,
+                      map: map,
+                      icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                    });
+                    markers.push(mousemarker);
                     chart.setSelection([]);
-                    chart.setSelection([{row:0,column:closest+1}]);
+                    chart.setSelection([{column:1,row:closest+1}]);
+                    console.log(closest);
                   }
 
                   // Takes an array of ElevationResult objects, draws the path on the map
@@ -174,6 +182,7 @@
 
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(function(position) {
+                          //reset();
                           var pos = {
                             lat: position.coords.latitude,
                             lng: position.coords.longitude
@@ -181,19 +190,21 @@
                            map.setCenter(pos);
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                            marker = new google.maps.Marker({position:latLong, map: map});
+                           markers.push(marker);
                            find_closest_marker(pos);
                         }, function() {
                           handleLocationError(true, infoWindow, map.getCenter());
                         });
                         navigator.geolocation.watchPosition(function(position) {
+                          //reset();
                           var pos = {
                             lat: position.coords.latitude,
                             lng: position.coords.longitude
                           };
                            map.setCenter(pos);
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                           map.clearOverlays();
                            marker = new google.maps.Marker({position:latLong, map: map});
+                           markers.push(marker);
                            find_closest_marker(pos);
                         }, function() {
                           handleLocationError(true, infoWindow, map.getCenter());
