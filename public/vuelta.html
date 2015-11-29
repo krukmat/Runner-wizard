@@ -209,7 +209,7 @@
 
                     //TODO: navigator.geolocation.watchPosition
                     if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(updatePosition, failureGetPosition);
+                        //navigator.geolocation.getCurrentPosition(updatePosition, failureGetPosition);
                         navigator.geolocation.watchPosition(updatePosition, failureGetPosition);
                       } else {
                         // Browser doesn't support Geolocation
