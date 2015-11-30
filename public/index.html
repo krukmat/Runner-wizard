@@ -17,6 +17,7 @@
                   // TODO: Mapa que sea optativo para mostrar
                   // TODO: Recomendacion online segun altura del tipo de carrera: rapido, loma, constante, ...
                   // TODO: Que se pueda definir nuevas rutas tomando puntos seleccionados por el usuario. luego se genera la ruta.
+                  // TODO: Opcion para guardar y cargar mapas
                   var map = null;
                   var chart = null;
                   var ida = true;
@@ -96,6 +97,17 @@
                   // Set a callback to run when the Google Visualization API is loaded.
                   google.setOnLoadCallback(initialize);
 
+                  var marker;
+                  var route = [];
+
+                  function placeMarker(location) {
+                      marker = new google.maps.Marker({
+                          position: location,
+                          map: map
+                        });
+                      route.push(marker);
+                  }
+
                   function initialize() {
                     var myLatlng = new google.maps.LatLng(-38.005022,-57.542555);
                     var myOptions = {
@@ -109,6 +121,7 @@
 
                     var centerControlDiv = document.createElement('div');
                     var centerControl = new BackButton(centerControlDiv, map);
+                    var backButton = new RouteButton(centerControlDiv, map);
 
                     centerControlDiv.index = 1;
                     map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
@@ -116,9 +129,10 @@
                     geocoderService = new google.maps.Geocoder();
                     elevationService = new google.maps.ElevationService();
                     directionsService = new google.maps.DirectionsService();
+                    google.maps.event.addListener(map, 'click', function(event) {
+                      placeMarker(event.latLng);
+                    });
 
-
-                    loadExample(0);
                   }
 
                   function failureGetPosition() {
@@ -133,9 +147,6 @@
                             lng: position.coords.longitude
                           };
                            map.setCenter(pos);
-                           var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                           marker = new google.maps.Marker({position:latLong, map: map});
-                           markers.push(marker);
                            find_closest_marker(pos);
                   }
 
@@ -176,6 +187,39 @@
 
                     }
 
+                  function RouteButton(controlDiv, map) {
+
+                      // Set CSS for the control border.
+                      var controlUI = document.createElement('div');
+                      controlUI.style.backgroundColor = '#fff';
+                      controlUI.style.border = '2px solid #fff';
+                      controlUI.style.borderRadius = '3px';
+                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                      controlUI.style.cursor = 'pointer';
+                      controlUI.style.marginBottom = '22px';
+                      controlUI.style.textAlign = 'center';
+                      controlUI.title = 'Route';
+                      controlDiv.appendChild(controlUI);
+
+                      // Set CSS for the control interior.
+                      var controlText = document.createElement('div');
+                      controlText.style.color = 'rgb(25,25,25)';
+                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      controlText.style.fontSize = '16px';
+                      controlText.style.lineHeight = '38px';
+                      controlText.style.paddingLeft = '5px';
+                      controlText.style.paddingRight = '5px';
+                      controlText.innerHTML = 'Route';
+                      controlUI.appendChild(controlText);
+
+                      // Setup the click event listeners: simply set the map to Chicago.
+                      controlUI.addEventListener('click', function() {
+                            loadRoute();
+                            //$(controlUI).hide();
+                      });
+
+                    }
+
                   function rad(x) {return x*Math.PI/180;}
 
                   function find_closest_marker( pos ) {
@@ -186,26 +230,21 @@
                     var closest = -1;
                     var init = 0;
                     var end = elevations.length;
-                    if (ida) {
-                        end = 128; //TODO: Usuario debe definir el punto de vuelta
-                    } else {
-                        init = 128; //TODO: Usuario debe definir el punto de vuelta
+                    for( var i = 0; i < elevations.length; i++ ) {
+                            var mlat = elevations[i].location.lat();
+                            var mlng = elevations[i].location.lng();
+                            var dLat  = rad(mlat - lat);
+                            var dLong = rad(mlng - lng);
+                            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                                Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+                            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                            var d = R * c;
+                            distances[i] = d;
+                            if ( closest == -1 || d < distances[closest] ) {
+                                closest = i;
+                            }
                     }
-                    for( var i = init; i < end; i++ ) {
-                        var mlat = elevations[i].location.lat();
-                        var mlng = elevations[i].location.lng();
-                        var dLat  = rad(mlat - lat);
-                        var dLong = rad(mlng - lng);
-                        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                            Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
-                        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                        var d = R * c;
-                        distances[i] = d;
-                        if ( closest == -1 || d < distances[closest] ) {
-                            closest = i;
-                        }
-                    }
-                    // chart.setSelection(['', elevations[closest].elevation]);
+
                     mousemarker = new google.maps.Marker({
                       position: elevations[closest].location,
                       map: map,
@@ -218,16 +257,24 @@
                     data.addColumn('number', 'Altura');
                     data.addColumn({type: 'string', role: 'style'});
 
-                    for (var i = 0; i < elevations.length; i++) {
-                        if (i<closest)
-                            data.addRow(['', elevations[i].elevation, 'color: #00ff00']);
-                        else
-                            data.addRow(['', elevations[i].elevation, 'color: #ff0000']);
+                    if (ida){
+                        for (var i = 0; i < elevations.length; i++) {
+                            if (i<closest)
+                                data.addRow(['', elevations[i].elevation, 'color: #00ff00']);
+                            else
+                                data.addRow(['', elevations[i].elevation, 'color: #ff0000']);
+                        }
+                    } else {
+                        for (var i = 0; i < elevations.length; i++) {
+                            if (i>closest)
+                                data.addRow(['', elevations[i].elevation, 'color: #00ff00']);
+                            else
+                                data.addRow(['', elevations[i].elevation, 'color: #ff0000']);
+                        }
                     }
 
                     document.getElementById('chart_div').style.display = 'block';
                     chart.draw(data, {
-                     // width: 512,
                       height: '100%',
                       legend: 'none',
                       titleY: 'Altura en metros',
@@ -307,13 +354,11 @@
 
                   // Add a marker and trigger recalculation of the path and elevation
                   function addMarker(latlng, doQuery) {
-                    //if (markers.length < 10) {
 
                       var marker = new google.maps.Marker({
                         position: latlng,
                         icon: "no",
                         map: map,
-                        //draggable: true
                       })
 
                       google.maps.event.addListener(marker, 'dragend', function(e) {
@@ -326,12 +371,6 @@
                         updateElevation();
                       }
 
-                     /* if (markers.length == 10) {
-                        document.getElementById('address').disabled = true;
-                      }*/
-                   // } else {
-                   //   alert("No more than 10 points can be added");
-                   // }
                   }
 
                   // Trigger the elevation query for point to point
@@ -420,20 +459,18 @@
                     }*/
                   }
 
-                  function loadExample(n) {
+                  function loadRoute() {
                     reset();
-                    map.setMapTypeId(examples[n].mapType);
-                    //document.getElementById('mode').value = examples[n].travelMode;
+                    map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
                     var bounds = new google.maps.LatLngBounds();
-                    for (var i = 0; i < examples[n].latlngs.length; i++) {
+                    for (var i = 0; i < route.length; i++) {
                       var latlng = new google.maps.LatLng(
-                        examples[n].latlngs[i][0],
-                        examples[n].latlngs[i][1]
+                        route[i].getPosition().lat(),
+                        route[i].getPosition().lng()
                       );
                       addMarker(latlng, false);
                       bounds.extend(latlng);
                     }
-                    //map.fitBounds(bounds);
                     updateElevation();
                   }
 
@@ -471,7 +508,6 @@
                         position: latlng,
                         icon: icon,
                         map: map
-
                     });
 
                     google.maps.event.addListener(marker, 'click', function() {
