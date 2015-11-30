@@ -122,6 +122,7 @@
                     var centerControlDiv = document.createElement('div');
                     var centerControl = new BackButton(centerControlDiv, map);
                     var backButton = new RouteButton(centerControlDiv, map);
+                    //var hideButton = new HideMapButton(centerControlDiv, map);
 
                     centerControlDiv.index = 1;
                     map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
@@ -142,11 +143,15 @@
                   function updatePosition(position) {
                           //reset();
                           clearMarkers();
+                          cleanupRoutes();
                           var pos = {
                             lat: position.coords.latitude,
                             lng: position.coords.longitude
                           };
                            map.setCenter(pos);
+                           var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                           marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
+                           markers.push(marker);
                            find_closest_marker(pos);
                   }
 
@@ -183,6 +188,38 @@
                             controlText.innerHTML = 'Ida';
                           }
                           ida = (!ida);
+                      });
+
+                    }
+
+                  function HideMapButton(controlDiv, map) {
+
+                      // Set CSS for the control border.
+                      var controlUI = document.createElement('div');
+                      controlUI.style.backgroundColor = '#fff';
+                      controlUI.style.border = '2px solid #fff';
+                      controlUI.style.borderRadius = '3px';
+                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                      controlUI.style.cursor = 'pointer';
+                      controlUI.style.marginBottom = '22px';
+                      controlUI.style.textAlign = 'center';
+                      controlUI.title = 'Hide Map';
+                      controlDiv.appendChild(controlUI);
+
+                      // Set CSS for the control interior.
+                      var controlText = document.createElement('div');
+                      controlText.style.color = 'rgb(25,25,25)';
+                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      controlText.style.fontSize = '16px';
+                      controlText.style.lineHeight = '38px';
+                      controlText.style.paddingLeft = '5px';
+                      controlText.style.paddingRight = '5px';
+                      controlText.innerHTML = 'Hide Map';
+                      controlUI.appendChild(controlText);
+
+                      // Setup the click event listeners: simply set the map to Chicago.
+                      controlUI.addEventListener('click', function() {
+                          $(map).hide();
                       });
 
                     }
@@ -244,13 +281,6 @@
                                 closest = i;
                             }
                     }
-
-                    mousemarker = new google.maps.Marker({
-                      position: elevations[closest].location,
-                      map: map,
-                      icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-                    });
-                    markers.push(mousemarker);
 
                     var data = new google.visualization.DataTable();
                     data.addColumn('string', 'Ejemplo');
@@ -472,6 +502,13 @@
                       bounds.extend(latlng);
                     }
                     updateElevation();
+                  }
+
+                  function cleanupRoutes(){
+                    for (var i in route) {
+                      route[i].setMap(null);
+                    }
+                    route = [];
                   }
 
                   function clearMarkers() {
