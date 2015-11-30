@@ -266,7 +266,7 @@
                         }
                     } else {
                         for (var i = 0; i < elevations.length; i++) {
-                            if (i>closest)
+                            if (i>=closest)
                                 data.addRow(['', elevations[i].elevation, 'color: #00ff00']);
                             else
                                 data.addRow(['', elevations[i].elevation, 'color: #ff0000']);
