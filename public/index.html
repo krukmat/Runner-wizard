@@ -16,7 +16,6 @@
                   // TODO: Code cleaning up.
                   // TODO: Mapa que sea optativo para mostrar
                   // TODO: Recomendacion online segun altura del tipo de carrera: rapido, loma, constante, ...
-                  // TODO: Que se pueda definir nuevas rutas tomando puntos seleccionados por el usuario. luego se genera la ruta.
                   // TODO: Opcion para guardar y cargar mapas
                   var map = null;
                   var chart = null;
@@ -31,65 +30,7 @@
                   var polyline = null;
                   var elevations = null;
 
-                  // TODO: Configurable. Asi se puede hacer para cualquier lado
                   var SAMPLES = 256;
-
-                  var examples = [{
-                    // 10 k
-                    latlngs: [
-                [-38.005022,-57.542555], // partida
-                [-38.008608,-57.533320], // torreon
-                [-38.017616,-57.525421], // cabo corrientes
-                //[-38.0264774,-57.5319665], //celso aldao
-                [-38.030257, -57.533665], // paseo victoria ocampo
-                //[-38.027740,-57.532767], // tunel playa grande
-                [-38.016550,-57.524441], // paseo galindez 1
-                [-38.007977, -57.537303], // paseo galindez 2
-                //[-38.005413,-57.542419] // plaza colon
-                [-38.006747, -57.539058], // los lobos
-                [-37.998802, -57.541765], // rotanda de los pescadores 1
-                [-37.999154, -57.542185], // rotanda de los pescadores 2
-                [-38.005022,-57.542555] // partida
-                    ],
-                    mapType: google.maps.MapTypeId.ROADMAP, // ROADMAP TERRAIN SATELLITE
-                    travelMode: 'walking'//'walking''direct' 'driving'
-                  },{
-                    // 21 k
-                    latlngs: [
-                [-38.005022,-57.542555], // partida
-                [-38.008608,-57.533320], // torreon
-                [-38.017616,-57.525421], // cabo corrientes
-                [-38.040665, -57.542219], //jb justo y peralta ramos
-                [-38.035723,-57.524916], // terminal crucero
-                //[-38.027740,-57.532767], // tunel playa grande
-                [-38.016550,-57.524441], // paseo galindez 1
-                [-38.007977, -57.537303], // paseo galindez 2
-                [-37.970714, -57.542560], // constitución
-                //[-37.987491, -57.545662], // ituzaingo e independencia
-                [-37.995142, -57.543851], // 11 de eseptiembre y la costa
-                [-38.005022,-57.542555] // partida
-                    ],
-                    mapType: google.maps.MapTypeId.ROADMAP,
-                    travelMode: 'walking'
-                  },{
-                    // 42 k
-                    latlngs: [
-                [-38.005022,-57.542555], // partida
-                [-38.008608,-57.533320], // torreon
-                [-38.017616,-57.525421], // cabo corrientes
-                [-38.040665, -57.542219], //jb justo y peralta ramos
-                [-38.035723,-57.524916], // terminal crucero
-                //[-38.027740,-57.532767], // tunel playa grande
-                [-38.016550,-57.524441], // paseo galindez 1
-                [-38.007977, -57.537303], // paseo galindez 2
-                [-37.970714, -57.542560], // constitución
-                //[-37.987491, -57.545662], // ituzaingo e independencia
-                [-37.995142, -57.543851], // 11 de eseptiembre y la costa
-                [-38.005022,-57.542555] // partida
-                    ],
-                    mapType: google.maps.MapTypeId.ROADMAP,
-                    travelMode: 'walking'
-                  }];
 
                   // Load the Visualization API and the piechart package.
                   google.load("visualization", "1", {packages: ["corechart"]});
@@ -252,7 +193,7 @@
                       // Setup the click event listeners: simply set the map to Chicago.
                       controlUI.addEventListener('click', function() {
                             loadRoute();
-                            //$(controlUI).hide();
+                            $(controlUI).hide();
                       });
 
                     }
@@ -357,31 +298,6 @@
                     }
                   }
 
-                 /* // Geocode an address and add a marker for the result
-                  function addAddress() {
-                    //var address = document.getElementById('address').value;
-                    geocoderService.geocode({ 'address': address }, function(results, status) {
-                      //document.getElementById('address').value = "";
-                      if (status == google.maps.GeocoderStatus.OK) {
-                        var latlng = results[0].geometry.location;
-                        addMarker(latlng, true);
-                        if (markers.length > 1) {
-                          var bounds = new google.maps.LatLngBounds();
-                          for (var i in markers) {
-                            bounds.extend(markers[i].getPosition());
-                          }
-                          map.fitBounds(bounds);
-                        } else {
-                          map.fitBounds(results[0].geometry.viewport);
-                        }
-                      } else if (status == google.maps.GeocoderStatus.ZERO_RESULTS) {
-                        alert("Address not found");
-                      } else {
-                        alert("Address lookup failed");
-                      }
-                    })
-                  }*/
-
                   // Add a marker and trigger recalculation of the path and elevation
                   function addMarker(latlng, doQuery) {
 
@@ -469,26 +385,6 @@
                     });
                   }
 
-                  // Trigger a geocode request when the Return key is
-                  // pressed in the address field
-                  function addressKeyHandler(e) {
-                 /*   var keycode;
-                    if (window.event) {
-                      keycode = window.event.keyCode;
-                    } else if (e) {
-                      keycode = e.which;
-                    } else {
-                      return true;
-                    }
-
-                    if (keycode == 13) {
-                       addAddress();
-                       return false;
-                    } else {
-                       return true;
-                    }*/
-                  }
-
                   function loadRoute() {
                     reset();
                     map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
@@ -547,10 +443,6 @@
                         map: map
                     });
 
-                    google.maps.event.addListener(marker, 'click', function() {
-                        infowindow.setContent(html);
-                        infowindow.open(map, marker);
-                    });
                     return marker;
                 }
 
@@ -559,20 +451,6 @@
                     createMarker(new google.maps.LatLng(locations[i][2], locations[i][3]), "<table style='width:100%;'><tr><td>" + locations[i][0] + "</td></tr></table>", locations[i][4]);
                 }
 
-                // Limitar rango de zoom
-                google.maps.event.addListener(map, 'zoom_changed', function()
-                {
-                    if (map.getZoom() < 12){
-                       map.setZoom(12);
-                    }
-                        if (map.getZoom() > 16){
-                       map.setZoom(16);
-                    }
-                });
-                }
-
-                function myclick(i) {
-                    google.maps.event.trigger(gmarkers[i],'click');
                 }
 
                 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
