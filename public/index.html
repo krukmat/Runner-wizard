@@ -58,6 +58,15 @@
                     }
                     infowindow = new google.maps.InfoWindow();
                     map = new google.maps.Map(document.getElementById("map"), myOptions);
+                    var noPoi = [
+                    {
+                        featureType: "poi",
+                        stylers: [
+                          { visibility: "off" }
+                        ]
+                      }
+                    ];
+                    map.setOptions({styles: noPoi});
                     chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
 
                     var centerControlDiv = document.createElement('div');
