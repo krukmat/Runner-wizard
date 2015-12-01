@@ -74,6 +74,18 @@
                     google.maps.event.addListener(map, 'click', function(event) {
                       placeMarker(event.latLng);
                     });
+                    google.visualization.events.addListener(chart, 'onmouseover', function(e) {
+                      if (mousemarker == null) {
+                        mousemarker = new google.maps.Marker({
+                          position: elevations[e.row].location,
+                          map: map,
+                          icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                        });
+                      } else {
+                        mousemarker.setPosition(elevations[e.row].location);
+                        map.setCenter(elevations[e.row].location);
+                      }
+                    });
 
                   }
 
