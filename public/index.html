@@ -315,7 +315,7 @@
                     }
 
                     var data = new google.visualization.DataTable();
-                    data.addColumn('string', 'Ejemplo');
+                    data.addColumn('string', 'test');
                     data.addColumn('number', 'Altura');
                     data.addColumn({type: 'string', role: 'style'});
 
@@ -339,7 +339,8 @@
                     chart.draw(data, {
                       height: '100%',
                       legend: 'none',
-                      titleY: 'Altura en metros',
+                      titleY: 'Altura',
+                      titleX: 'Vel:' + sessionAvgSpeed + ' km/min',
                       focusBorderColor: '#00ff00'
                     });
 
