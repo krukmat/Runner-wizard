@@ -179,6 +179,7 @@
                                 });
                                 infowindow.open(map, marker);
                            });
+                           $(document).prop('title', "Current speed " + sessionAvgSpeed + " km/min");
                            find_closest_marker(pos);
                   }
 
