@@ -29,6 +29,7 @@
                   var markers = [];
                   var polyline = null;
                   var elevations = null;
+                  var id_watch = 0;
 
                   var SAMPLES = 256;
 
@@ -101,6 +102,20 @@
                         map.setCenter(elevations[e.row].location);
                       }
                     });
+
+                    if (navigator.geolocation) {
+                        id_watch = navigator.geolocation.getCurrentPosition(function (position) {
+                            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                            marker = new google.maps.Marker({
+                              position: initialLocation,
+                              map: map,
+                              icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                            });
+                            map.setCenter(initialLocation);
+                            navigator.geolocation.clearWatch(id_watch);
+                            markers.push(marker);
+                        });
+                    }
 
                   }
 
