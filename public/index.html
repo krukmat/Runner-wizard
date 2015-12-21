@@ -6,7 +6,8 @@
     <style type="text/css">
         html, body { height: 100%; margin: 0; padding: 0; }
         #map { height: 70%; }
-        #chart_div { height: 30%; }
+        #chart_div { height: 20%; }
+        #speeds_div { height: 20%; }
     </style>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDl9TGC98BJn4hMIHL5o7umITbXqF2YbzQ"></script>
@@ -35,6 +36,8 @@
                   var sessionDistance = 0;
                   var sessionAvgSpeed = 0;
                   var start = null;
+                  var speeds = [];
+                  var speedsChart = null;
 
 
                   var SAMPLES = 256;
@@ -81,6 +84,7 @@
                       intervalAvgSpeed = (moment().diff(last,'minute')/sessionDistance);
                       last = moment();
                       prevCoord = coords;
+                      speeds.push(intervalAvgSpeed);
                   }
 
                   function placeMarker(location) {
@@ -116,6 +120,7 @@
                     ];
                     map.setOptions({styles: noPoi});
                     chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+                    speedsChart = new google.visualization.AreaChart(document.getElementById('speeds_div'));
 
                     var centerControlDiv = document.createElement('div');
                     var centerControl = new BackButton(centerControlDiv, map);
@@ -184,6 +189,7 @@
                            });
                            $(document).prop('title', "Current speed " + sessionAvgSpeed + " mins/km");
                            find_closest_marker(pos);
+                           drawSpeeds();
                   }
 
                   function BackButton(controlDiv, map) {
@@ -285,7 +291,8 @@
                             start = last = moment();
                             loadRoute();
                             if (mobileAndTabletcheck()) {
-                                $('#chart_div').height('90%');
+                                $('#chart_div').height('60%');
+                                $('#speeds_div').height('30%');
                                 $('#map').height('10%');
                             }
                       });
@@ -293,6 +300,26 @@
                     }
 
                   function rad(x) {return x*Math.PI/180;}
+
+                  function drawSpeeds(){
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'test');
+                    data.addColumn('number', 'Average Speed');
+                    data.addColumn({type: 'string', role: 'style'});
+
+                    for (var i = 0; i < speeds.length; i++) {
+                            if (!(isNaN(speeds[i])))
+                                data.addRow(['', speeds[i], 'color: #0000FF']);
+                    }
+
+                    document.getElementById('speeds_div').style.display = 'block';
+                    speedsChart.draw(data, {
+                      height: '100%',
+                      legend: 'none',
+                      titleY: 'Interval Speed',
+                      focusBorderColor: '#00ff00'
+                    });
+                  }
 
                   function find_closest_marker( pos ) {
                     var lat = pos.lat;
@@ -343,7 +370,6 @@
                       height: '100%',
                       legend: 'none',
                       titleY: 'Height',
-                      titleX: 'Interval:' + intervalAvgSpeed + ' mins/km',
                       focusBorderColor: '#00ff00'
                     });
 
@@ -519,6 +545,7 @@
                     markers = [];
 
                     document.getElementById('chart_div').style.display = 'none';
+                    document.getElementById('speeds_div').style.display = 'none';
                   var locations = [
                     ["Partida",
                     "Partida",
@@ -557,6 +584,7 @@
 </head>
 <body>
 <div id="map"></div>
+<div id="speeds_div"></div>
 <div id="chart_div"></div>
 </body>
 </html>
