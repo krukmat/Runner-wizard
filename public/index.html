@@ -75,8 +75,11 @@
                       if (!prevCoord) {
                         prevCoord = coords;
                       }
-                      sessionDistance += calculateDistance(prevCoord.coords, coords.coords);
+                      invertalDistance = calculateDistance(prevCoord.coords, coords.coords);
+                      sessionDistance += invertalDistance;
                       sessionAvgSpeed = (moment().diff(start,'minute')/sessionDistance);
+                      intervalAvgSpeed = (moment().diff(last,'minute')/sessionDistance);
+                      last = moment();
                       prevCoord = coords;
                   }
 
@@ -279,7 +282,7 @@
 
                       // Setup the click event listeners: simply set the map to Chicago.
                       controlUI.addEventListener('click', function() {
-                            start = moment();
+                            start = last = moment();
                             loadRoute();
                             if (mobileAndTabletcheck()) {
                                 $('#chart_div').height('90%');
@@ -339,8 +342,8 @@
                     chart.draw(data, {
                       height: '100%',
                       legend: 'none',
-                      titleY: 'Altura',
-                      titleX: 'Vel:' + sessionAvgSpeed + ' mins/km',
+                      titleY: 'Height',
+                      titleX: 'Interval:' + intervalAvgSpeed + ' mins/km',
                       focusBorderColor: '#00ff00'
                     });
 
