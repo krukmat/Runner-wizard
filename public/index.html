@@ -76,7 +76,7 @@
                         prevCoord = coords;
                       }
                       sessionDistance += calculateDistance(prevCoord.coords, coords.coords);
-                      sessionAvgSpeed = (sessionDistance / moment().diff(start,'minute'));
+                      sessionAvgSpeed = (moment().diff(start,'minute')/sessionDistance);
                       prevCoord = coords;
                   }
 
@@ -175,11 +175,11 @@
                            markers.push(marker);
                            marker.addListener('click', function() {
                                 var infowindow = new google.maps.InfoWindow({
-                                    content: "Current speed " + sessionAvgSpeed + " km/min"
+                                    content: "Current speed " + sessionAvgSpeed + " mins/km"
                                 });
                                 infowindow.open(map, marker);
                            });
-                           $(document).prop('title', "Current speed " + sessionAvgSpeed + " km/min");
+                           $(document).prop('title', "Current speed " + sessionAvgSpeed + " mins/km");
                            find_closest_marker(pos);
                   }
 
@@ -340,7 +340,7 @@
                       height: '100%',
                       legend: 'none',
                       titleY: 'Altura',
-                      titleX: 'Vel:' + sessionAvgSpeed + ' km/min',
+                      titleX: 'Vel:' + sessionAvgSpeed + ' mins/km',
                       focusBorderColor: '#00ff00'
                     });
 
