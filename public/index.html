@@ -81,8 +81,10 @@
                   }
 
                   function setSpeed2(coords) {
-                    sessionAvgSpeed = coords.coords.speed;
-                    speeds.push(coords.coords.speed);
+                    if ((coords.coords.speed !== null) && (coords.coords.speed > 0.5)) {
+                        sessionAvgSpeed = coords.coords.speed;
+                        speeds.push(coords.coords.speed);
+                    }
                   }
 
                   function setSpeed(coords) {
