@@ -87,7 +87,7 @@
                       sessionDistance += invertalDistance;
                       var diff_time = moment().diff(start,'second');
                       if (diff_time > 0){
-                          sessionAvgSpeed = (sessionDistance/diff_time) * KMS_TO_KMH;
+                          sessionAvgSpeed = (sessionDistance/diff_time);
                           speeds.push(sessionAvgSpeed);
                       }
                       intervalAvgSpeed = (invertalDistance/moment().diff(last,'minute'));
