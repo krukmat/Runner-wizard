@@ -35,6 +35,7 @@
                   var prevCoord = false;
                   var sessionDistance = 0;
                   var sessionAvgSpeed = 0;
+                  var intervalAvgSpeed = 0;
                   var start = null;
                   var speeds = [];
                   var speedsChart = null;
@@ -84,7 +85,7 @@
                       intervalAvgSpeed = (moment().diff(last,'minute')/invertalDistance);
                       last = moment();
                       prevCoord = coords;
-                      speeds.push(intervalAvgSpeed);
+                      speeds.push(sessionAvgSpeed);
                   }
 
                   function placeMarker(location) {
@@ -316,7 +317,7 @@
                     speedsChart.draw(data, {
                       height: '100%',
                       legend: 'none',
-                      titleY: 'Interval Speed',
+                      titleY: 'Interval Speed:'+intervalAvgSpeed,
                       focusBorderColor: '#00ff00'
                     });
                   }
