@@ -82,8 +82,8 @@
 
                   function setSpeed(coords) {
                     if (coords.coords.speed !== null) {
-                        // convierto de m/s a km/h => 1000/3600 = 0.27778
-                        sessionAvgSpeed = coords.coords.speed * 0.27778;
+                        // convierto de m/s a km/h => 3600/1000 = 3.6
+                        sessionAvgSpeed = coords.coords.speed * 3.6;
                         speeds.push(sessionAvgSpeed);
                     }
                   }
