@@ -76,16 +76,21 @@
                   }
 
                   function setSpeed(coords) {
+                      var KMS_TO_KMH = 3600;
                       if (!prevCoord) {
                         prevCoord = coords;
                       }
                       invertalDistance = calculateDistance(prevCoord.coords, coords.coords);
                       sessionDistance += invertalDistance;
-                      sessionAvgSpeed = (sessionDistance/moment().diff(start,'minute'));
+                      var diff_time = moment().diff(start,'second');
+                      if (diff_time > 0){
+                          sessionAvgSpeed = (sessionDistance/diff_time) * KMS_TO_KMH;
+                          speeds.push(sessionAvgSpeed);
+                      }
                       intervalAvgSpeed = (invertalDistance/moment().diff(last,'minute'));
                       last = moment();
                       prevCoord = coords;
-                      speeds.push(sessionAvgSpeed);
+
                   }
 
                   function placeMarker(location) {
@@ -317,7 +322,7 @@
                     speedsChart.draw(data, {
                       height: '100%',
                       legend: 'none',
-                      titleY: 'Interval Speed:'+intervalAvgSpeed,
+                      titleY: 'Interval Speed:'+sessionAvgSpeed,
                       focusBorderColor: '#00ff00'
                     });
                   }
