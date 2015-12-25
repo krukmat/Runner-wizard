@@ -86,9 +86,11 @@
                       invertalDistance = calculateDistance(prevCoord.coords, coords.coords);
                       sessionDistance += invertalDistance;
                       var diff_time = moment().diff(start,'second');
-                      if (diff_time > 0){
-                          sessionAvgSpeed = (sessionDistance/diff_time);
-                          speeds.push(sessionAvgSpeed);
+                      if(diff_time > 0){
+                          if(sessionAvgSpeed > 0.001){
+                              sessionAvgSpeed = (sessionDistance/diff_time);
+                              speeds.push(sessionAvgSpeed);
+                          }
                       }
                       intervalAvgSpeed = (invertalDistance/moment().diff(last,'minute'));
                       last = moment();
