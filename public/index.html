@@ -81,7 +81,7 @@
                   }
 
                   function setSpeed2(coords) {
-                    if ((coords.coords.speed !== null) && (coords.coords.speed > 0)) {
+                    if (coords.coords.speed !== null) {
                         sessionAvgSpeed = coords.coords.speed;
                         speeds.push(coords.coords.speed);
                     }
