@@ -80,29 +80,12 @@
                       }
                   }
 
-                  function setSpeed2(coords) {
-                    if (coords.coords.speed !== null) {
-                        sessionAvgSpeed = coords.coords.speed;
-                        speeds.push(coords.coords.speed);
-                    }
-                  }
-
                   function setSpeed(coords) {
-                      var KMS_TO_KMH = 3600;
-                      if (!prevCoord) {
-                        prevCoord = coords;
-                      }
-                      invertalDistance = calculateDistance(prevCoord.coords, coords.coords);
-                      sessionDistance += invertalDistance;
-                      var diff_time = moment().diff(start,'second');
-                      if(diff_time > 0){
-                          sessionAvgSpeed = (sessionDistance/diff_time);
-                          speeds.push(sessionAvgSpeed);
-                      }
-                      intervalAvgSpeed = (invertalDistance/moment().diff(last,'minute'));
-                      last = moment();
-                      prevCoord = coords;
-
+                    if (coords.coords.speed !== null) {
+                        // convierto de m/s a km/h => 1000/3600 = 0.27778
+                        sessionAvgSpeed = coords.coords.speed * 0.27778;
+                        speeds.push(sessionAvgSpeed);
+                    }
                   }
 
                   function placeMarker(location) {
@@ -190,7 +173,7 @@
                           //reset();
                           clearMarkers();
                           cleanupRoutes();
-                          setSpeed2(position);
+                          setSpeed(position);
                           var pos = {
                             lat: position.coords.latitude,
                             lng: position.coords.longitude
@@ -201,11 +184,11 @@
                            markers.push(marker);
                            marker.addListener('click', function() {
                                 var infowindow = new google.maps.InfoWindow({
-                                    content: "Current speed " + sessionAvgSpeed + " mins/km"
+                                    content: "Current speed " + sessionAvgSpeed + " kms/hour"
                                 });
                                 infowindow.open(map, marker);
                            });
-                           $(document).prop('title', "Current speed " + sessionAvgSpeed + " mins/km");
+                           $(document).prop('title', "Current speed " + sessionAvgSpeed + " kms/hour");
                            find_closest_marker(pos);
                            drawSpeeds();
                   }
@@ -322,7 +305,7 @@
                   function drawSpeeds(){
                     var data = new google.visualization.DataTable();
                     data.addColumn('string', 'test');
-                    data.addColumn('number', 'Average Speed');
+                    data.addColumn('number', 'Current Speed');
                     data.addColumn({type: 'string', role: 'style'});
 
                     for (var i = 0; i < speeds.length; i++) {
@@ -334,7 +317,7 @@
                     speedsChart.draw(data, {
                       height: '100%',
                       legend: 'none',
-                      titleY: 'Interval Speed:'+sessionAvgSpeed,
+                      titleY: 'Current Speed:'+sessionAvgSpeed,
                       focusBorderColor: '#00ff00'
                     });
                   }
