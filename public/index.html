@@ -57,10 +57,20 @@
                   var marker;
                   var route = [];
 
+                  function getRandomArbitrary(min, max) {
+                      return Math.random() * (max - min) + min;
+                  }
+
                   function setSpeed(coords) {
-                    if (coords.coords.speed !== null) {
-                        // convierto de m/s a km/h => 3600/1000 = 3.6
-                        sessionAvgSpeed = coords.coords.speed * 3.6;
+                    if (mobileAndTabletcheck()) {
+                        if (coords.coords.speed !== null) {
+                            // convierto de m/s a km/h => 3600/1000 = 3.6
+                            sessionAvgSpeed = coords.coords.speed * 3.6;
+                            speeds.push(sessionAvgSpeed);
+                        }
+                    }
+                    else{
+                        sessionAvgSpeed = getRandomArbitrary(0, 15);
                         speeds.push(sessionAvgSpeed);
                     }
                   }
@@ -271,6 +281,7 @@
                   function rad(x) {return x*Math.PI/180;}
 
                   function drawSpeeds(){
+                    // TODO: Mover al init data. Agregar solo la ultima velocidad
                     var data = new google.visualization.DataTable();
                     data.addColumn('string', 'test');
                     data.addColumn('number', 'Current Speed');
@@ -312,7 +323,7 @@
                                 closest = i;
                             }
                     }
-
+                    // TODO: Evitar inicializar aca. Hacer en initialize. Ver como editar un DataTable en vez de recrear. cambiar color
                     var data = new google.visualization.DataTable();
                     data.addColumn('string', 'test');
                     data.addColumn('number', 'Altura');
