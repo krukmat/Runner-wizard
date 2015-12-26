@@ -17,7 +17,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script type="text/javascript" src="js/moment.js"></script>
     <script>
-        // JavaScript Document
+                  // JavaScript Document
                   // TODO: Code cleaning up.
                   // TODO: Mapa que sea optativo para mostrar
                   // TODO: Recomendacion online segun altura del tipo de carrera: rapido, loma, constante, ...
@@ -58,26 +58,6 @@
                   function toRad(value) {
                       var RADIANT_CONSTANT = 0.0174532925199433;
                       return (value * RADIANT_CONSTANT);
-                  }
-
-                  function calculateDistance(starting, ending) {
-                      console.log(starting);
-                      console.log(ending);
-                      var KM_RATIO = 6371;
-                      try {
-                        var dLat = toRad(ending.latitude - starting.latitude);
-                        var dLon = toRad(ending.longitude - starting.longitude);
-                        var lat1Rad = toRad(starting.latitude);
-                        var lat2Rad = toRad(ending.latitude);
-
-                        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                                Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1Rad) * Math.cos(lat2Rad);
-                        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                        var d = KM_RATIO * c;
-                        return d;
-                      } catch(e) {
-                        return -1;
-                      }
                   }
 
                   function setSpeed(coords) {
@@ -126,7 +106,6 @@
                     var centerControlDiv = document.createElement('div');
                     var centerControl = new BackButton(centerControlDiv, map);
                     var backButton = new RouteButton(centerControlDiv, map);
-                    //var hideButton = new HideMapButton(centerControlDiv, map);
 
                     centerControlDiv.index = 1;
                     map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
@@ -166,11 +145,10 @@
                   }
 
                   function failureGetPosition() {
-                    handleLocationError(true, infoWindow, map.getCenter());
+                      handleLocationError(true, infoWindow, map.getCenter());
                   }
 
                   function updatePosition(position) {
-                          //reset();
                           clearMarkers();
                           cleanupRoutes();
                           setSpeed(position);
@@ -182,13 +160,6 @@
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
-                           marker.addListener('click', function() {
-                                var infowindow = new google.maps.InfoWindow({
-                                    content: "Current speed " + sessionAvgSpeed + " kms/hour"
-                                });
-                                infowindow.open(map, marker);
-                           });
-                           $(document).prop('title', "Current speed " + sessionAvgSpeed + " kms/hour");
                            find_closest_marker(pos);
                            drawSpeeds();
                   }
@@ -399,9 +370,9 @@
 
                     if (navigator.geolocation) {
                         var options = {
-                              enableHighAccuracy: true,
-                              maximumAge:30000,
-                              timeout:27000
+                              enableHighAccuracy: false,
+                              maximumAge: 0,
+                              timeout: 5000
                         };
                         navigator.geolocation.watchPosition(updatePosition, failureGetPosition, options);
                       } else {
