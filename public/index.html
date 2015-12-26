@@ -161,7 +161,7 @@
                       handleLocationError(true, infoWindow, map.getCenter());
                   }
 
-                  function updatePosition(position) {
+                  function updatePositionOK(position) {
                           clearMarkers();
                           cleanupRoutes();
                           setSpeed(position);
@@ -175,6 +175,10 @@
                            markers.push(marker);
                            find_closest_marker(pos);
                            updateSpeedChart();
+                  }
+
+                  function updatePosition() {
+                        navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition);
                   }
 
                   function BackButton(controlDiv, map) {
@@ -380,7 +384,7 @@
                               maximumAge: 0,
                               timeout: 5000
                         };
-                        navigator.geolocation.watchPosition(updatePosition, failureGetPosition, options);
+                        setInterval(updatePosition, 3000);
                       } else {
                         // Browser doesn't support Geolocation
                         var infoWindow = new google.maps.InfoWindow({map: map});
