@@ -44,6 +44,7 @@
                   var start = null;
                   var speeds = [];
                   var speedsChart = null;
+                  var speedData = null;
 
 
                   var SAMPLES = 256;
@@ -66,12 +67,10 @@
                         if (coords.coords.speed !== null) {
                             // convierto de m/s a km/h => 3600/1000 = 3.6
                             sessionAvgSpeed = coords.coords.speed * 3.6;
-                            speeds.push(sessionAvgSpeed);
                         }
                     }
                     else{
                         sessionAvgSpeed = getRandomArbitrary(0, 15);
-                        speeds.push(sessionAvgSpeed);
                     }
                   }
 
@@ -120,6 +119,13 @@
                     geocoderService = new google.maps.Geocoder();
                     elevationService = new google.maps.ElevationService();
                     directionsService = new google.maps.DirectionsService();
+
+                    speedData = new google.visualization.DataTable();
+                    speedData.addColumn('string', 'test');
+                    speedData.addColumn('number', 'Current Speed');
+                    speedData.addColumn({type: 'string', role: 'style'});
+
+
                     google.maps.event.addListener(map, 'click', function(event) {
                       placeMarker(event.latLng);
                     });
@@ -168,7 +174,7 @@
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
                            find_closest_marker(pos);
-                           drawSpeeds();
+                           updateSpeedChart();
                   }
 
                   function BackButton(controlDiv, map) {
@@ -280,20 +286,11 @@
 
                   function rad(x) {return x*Math.PI/180;}
 
-                  function drawSpeeds(){
-                    // TODO: Mover al init data. Agregar solo la ultima velocidad
-                    var data = new google.visualization.DataTable();
-                    data.addColumn('string', 'test');
-                    data.addColumn('number', 'Current Speed');
-                    data.addColumn({type: 'string', role: 'style'});
-
-                    for (var i = 0; i < speeds.length; i++) {
-                            if (!(isNaN(speeds[i])))
-                                data.addRow(['', speeds[i], 'color: #0000FF']);
-                    }
-
+                  function updateSpeedChart(){
+                    speedData.addRow(['', sessionAvgSpeed, 'color: #0000FF']);
                     document.getElementById('speeds_div').style.display = 'block';
-                    speedsChart.draw(data, {
+                    speedsChart.clearChart();
+                    speedsChart.draw(speedData, {
                       height: '100%',
                       legend: 'none',
                       titleY: 'Current Speed:'+sessionAvgSpeed,
@@ -346,6 +343,7 @@
                     }
 
                     document.getElementById('chart_div').style.display = 'block';
+                    chart.clearChart();
                     chart.draw(data, {
                       height: '100%',
                       legend: 'none',
