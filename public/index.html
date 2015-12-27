@@ -18,7 +18,6 @@
     <script type="text/javascript" src="js/moment.js"></script>
     <script>
                   // JavaScript Document
-                  // TODO: Cargador de velocidades fake en el caso de no ser mobile para memory profiling.
                   // TODO: Code cleaning up.
                   // TODO: Mapa que sea optativo para mostrar o mostrarlo de una forma que sea user friendly
                   // TODO: Recomendacion online segun altura del tipo de carrera: rapido, loma, constante, ...
@@ -291,6 +290,10 @@
                   function rad(x) {return x*Math.PI/180;}
 
                   function updateSpeedChart(){
+                    // get the last 30 rows only
+                    if (speedData.getNumberOfRows() > 30) {
+                        speedData.removeRow(0);
+                    }
                     speedData.addRow(['', sessionAvgSpeed, 'color: #0000FF']);
                     document.getElementById('speeds_div').style.display = 'block';
                     speedsChart.clearChart();
@@ -324,7 +327,6 @@
                                 closest = i;
                             }
                     }
-                    // TODO: Evitar inicializar aca. Hacer en initialize. Ver como editar un DataTable en vez de recrear. cambiar color
                     var data = new google.visualization.DataTable();
                     data.addColumn('string', 'test');
                     data.addColumn('number', 'Altura');
