@@ -66,6 +66,8 @@
                         if (coords.coords.speed !== null) {
                             // convierto de m/s a km/h => 3600/1000 = 3.6
                             sessionAvgSpeed = coords.coords.speed * 3.6;
+                        } else {
+                            sessionAvgSpeed = 0;
                         }
                     }
                     else{
