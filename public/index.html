@@ -292,8 +292,8 @@
                   function rad(x) {return x*Math.PI/180;}
 
                   function updateSpeedChart(){
-                    // get the last 4000 rows only
-                    if (speedData.getNumberOfRows() > 4000) {
+                    // get the last 400 rows only
+                    if (speedData.getNumberOfRows() > 400) {
                         speedData.removeRow(0);
                     }
                     speedData.addRow(['', sessionAvgSpeed, 'color: #0000FF']);
