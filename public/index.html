@@ -290,8 +290,8 @@
                   function rad(x) {return x*Math.PI/180;}
 
                   function updateSpeedChart(){
-                    // get the last 30 rows only
-                    if (speedData.getNumberOfRows() > 30) {
+                    // get the last 4000 rows only
+                    if (speedData.getNumberOfRows() > 4000) {
                         speedData.removeRow(0);
                     }
                     speedData.addRow(['', sessionAvgSpeed, 'color: #0000FF']);
@@ -381,12 +381,7 @@
                       map: map});
 
                     if (navigator.geolocation) {
-                        var options = {
-                              enableHighAccuracy: false,
-                              maximumAge: 0,
-                              timeout: 5000
-                        };
-                        setInterval(updatePosition, 75);
+                        setInterval(updatePosition, 100);
                       } else {
                         // Browser doesn't support Geolocation
                         var infoWindow = new google.maps.InfoWindow({map: map});
