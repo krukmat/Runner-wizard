@@ -67,7 +67,7 @@
                     if (mobileAndTabletcheck()) {
                         if (coord.coords.speed !== null) {
                             // convierto de m/s a km/h => 3600/1000 = 3.6
-                            sessionAvgSpeed = coord.coords.speed;
+                            sessionAvgSpeed = coord.coords.speed * 3.6;
                         } else {
                             sessionAvgSpeed = 0;
                         }
@@ -173,6 +173,9 @@
                             lng: position.coords.longitude
                           };
                            map.setCenter(pos);
+                           var infoWindow = new google.maps.InfoWindow({map: map});
+                           infoWindow.setContent(position.coords.speed);
+                           infoWindow.setPosition(map.getCenter());
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
@@ -283,9 +286,9 @@
                             start = last = moment();
                             loadRoute();
                             if (mobileAndTabletcheck()) {
-                                $('#chart_div').height('60%');
-                                $('#speeds_div').height('30%');
-                                $('#map').height('10%');
+                                $('#chart_div').height('0%');
+                                $('#speeds_div').height('0%');
+                                $('#map').height('100%');
                             }
                       });
 
