@@ -182,7 +182,12 @@
                   }
 
                   function updatePosition() {
-                        navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition);
+                        var options = {
+                          enableHighAccuracy: true,
+                          timeout: 5000,
+                          maximumAge: 0
+                        };
+                        navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition, options);
                   }
 
                   function BackButton(controlDiv, map) {
