@@ -168,7 +168,7 @@
                           clearMarkers();
                           cleanupRoutes();
                           setSpeed(position);
-                          var pos = {
+                          /*var pos = {
                             lat: position.coords.latitude,
                             lng: position.coords.longitude
                           };
@@ -176,7 +176,7 @@
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
-                           find_closest_marker(pos);
+                           find_closest_marker(pos);*/
                            updateSpeedChart();
                   }
 
@@ -283,9 +283,9 @@
                             start = last = moment();
                             loadRoute();
                             if (mobileAndTabletcheck()) {
-                                $('#chart_div').height('60%');
-                                $('#speeds_div').height('30%');
-                                $('#map').height('10%');
+                                $('#chart_div').height('0%');
+                                $('#speeds_div').height('50%');
+                                $('#map').height('50%');
                             }
                       });
 
