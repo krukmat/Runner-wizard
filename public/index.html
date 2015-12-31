@@ -67,9 +67,9 @@
                     if (mobileAndTabletcheck()) {
                         if (coord.coords.speed !== null) {
                             // convierto de m/s a km/h => 3600/1000 = 3.6
-                            sessionAvgSpeed = coord.coords.speed * 3.6;
+                            sessionAvgSpeed = coord.coords.speed;
                         } else {
-                            sessionAvgSpeed = -10;
+                            sessionAvgSpeed = 0;
                         }
                     }
                     else{
