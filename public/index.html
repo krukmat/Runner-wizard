@@ -182,11 +182,7 @@
                   }
 
                   function updatePosition() {
-                        var options = {
-                          enableHighAccuracy: true,
-                          timeout: 5000,
-                          maximumAge: 0
-                        };
+                        var options = {enableHighAccuracy:true,maximumAge:30000,timeout:27000};
                         navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition, options);
                   }
 
