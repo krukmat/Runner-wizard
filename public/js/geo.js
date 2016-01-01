@@ -421,6 +421,19 @@ function find_closest_marker( pos ) {
                     chart.setSelection([{column:1,row:closest+1}]);
                   }
 
+function clearMarkers() {
+                    for (var i in markers) {
+                      markers[i].setMap(null);
+                    }
+                  }
+
+function cleanupRoutes(){
+                    for (var i in route) {
+                      route[i].setMap(null);
+                    }
+                    route = [];
+                  }
+
 function geo_success(position){
     info_string="";
     var d=new Date();
@@ -442,6 +455,8 @@ function geo_success(position){
             prev_long=position.coords.longitude;
            info_string="Current positon: lat="+position.coords.latitude+", long="+position.coords.longitude+" (accuracy "+Math.round(position.coords.accuracy,1)+"m)<br />Speed: current="+position.coords.speed+"min="+(min_speed?min_speed:"Not recorded/0")+"m/s, max="+(max_speed?max_speed:"Not recorded/0")+"m/s<br />Altitude: min="+(min_altitude?min_altitude:"Not recorded/0")+"m, max="+(max_altitude?max_altitude:"Not recorded/0")+"m (accuracy "+Math.round(position.coords.altitudeAccuracy,1)+"m)<br />last reading taken at: "+current_datetime;
         }
+        clearMarkers();
+        cleanupRoutes();
 var pos = {
                             lat: position.coords.latitude,
                             lng: position.coords.longitude
@@ -451,6 +466,7 @@ var pos = {
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
+
         setSpeed(position);
         updateSpeedChart();
         find_closest_marker(position);
