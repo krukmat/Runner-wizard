@@ -117,7 +117,7 @@
                     var backButton = new RouteButton(centerControlDiv, map);
 
                     centerControlDiv.index = 1;
-                    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
+                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
 
                     geocoderService = new google.maps.Geocoder();
                     elevationService = new google.maps.ElevationService();
@@ -204,10 +204,10 @@
                       controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
                       controlText.style.fontSize = '16px';
                       controlText.style.lineHeight = '38px';
-                      controlText.style.paddingLeft = '20px';
-                      controlText.style.paddingRight = '20px';
-                      controlText.style.paddingBottom = '20px';
-                      controlText.style.paddingTop = '20px';
+                      controlText.style.paddingLeft = '30px';
+                      controlText.style.paddingRight = '30px';
+                      controlText.style.paddingBottom = '30px';
+                      controlText.style.paddingTop = '30px';
                       controlText.innerHTML = 'Ida';
                       controlUI.appendChild(controlText);
 
@@ -244,10 +244,10 @@
                       controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
                       controlText.style.fontSize = '16px';
                       controlText.style.lineHeight = '38px';
-                      controlText.style.paddingLeft = '20px';
-                      controlText.style.paddingRight = '20px';
-                      controlText.style.paddingTop = '20px';
-                      controlText.style.paddingBottom = '20px';
+                      controlText.style.paddingLeft = '30px';
+                      controlText.style.paddingRight = '30px';
+                      controlText.style.paddingTop = '30px';
+                      controlText.style.paddingBottom = '30px';
                       controlText.innerHTML = 'Route';
                       controlUI.appendChild(controlText);
 
