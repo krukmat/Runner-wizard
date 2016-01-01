@@ -23,8 +23,6 @@
                   // TODO: Recomendacion online segun altura del tipo de carrera: rapido, loma, constante, ...
                   // TODO: Opcion para guardar y cargar mapas
 
-                  var INTERVAL = 100;
-
                   var map = null;
                   var chart = null;
                   var ida = true;
@@ -63,11 +61,11 @@
                       return Math.random() * (max - min) + min;
                   }
 
-                  function setSpeed(coord) {
+                  function setSpeed(coords) {
                     if (mobileAndTabletcheck()) {
-                        if (coord.coords.speed !== null) {
+                        if (coords.coords.speed !== null) {
                             // convierto de m/s a km/h => 3600/1000 = 3.6
-                            sessionAvgSpeed = coord.coords.speed * 3.6;
+                            sessionAvgSpeed = coords.coords.speed * 3.6;
                         } else {
                             sessionAvgSpeed = 0;
                         }
@@ -173,7 +171,6 @@
                             lng: position.coords.longitude
                           };
                            map.setCenter(pos);
-                           document.title = position.coords.speed;
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
@@ -182,8 +179,7 @@
                   }
 
                   function updatePosition() {
-                        var options = {enableHighAccuracy:true,maximumAge:30000,timeout:27000};
-                        navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition, options);
+                        navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition);
                   }
 
                   function BackButton(controlDiv, map) {
@@ -387,9 +383,7 @@
                       map: map});
 
                     if (navigator.geolocation) {
-                        var options = {enableHighAccuracy:true,maximumAge:0,timeout:5000};
-                        //navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, options);
-                        setInterval(updatePosition, INTERVAL);
+                        setInterval(updatePosition, 100);
                       } else {
                         // Browser doesn't support Geolocation
                         var infoWindow = new google.maps.InfoWindow({map: map});
