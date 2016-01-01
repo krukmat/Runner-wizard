@@ -272,9 +272,14 @@ function BackButton(controlDiv, map) {
                       // Setup the click event listeners: simply set the map to Chicago.
                       controlUI.addEventListener('click', function() {
                           if (ida) {
-                            controlText.innerHTML = 'Vuelta';
+                            if(wpid){
+                                navigator.geolocation.clearWatch(wpid);
+                                wpid=false;
+                            }else{
+                                get_pos();
+                            }
                           } else {
-                            controlText.innerHTML = 'Ida';
+                            // TODO: Vuelta
                           }
                           ida = (!ida);
                       });
@@ -361,8 +366,8 @@ function init_map(){
 }
 
 function find_closest_marker( pos ) {
-                    var lat = pos.lat;
-                    var lng = pos.lng;
+                    var lat = pos.coords.latitude;
+                    var lng = pos.coords.longitude;
                     var R = 6371; // radius of earth in km
                     var distances = [];
                     var closest = -1;
@@ -417,7 +422,6 @@ function find_closest_marker( pos ) {
                   }
 
 function geo_success(position){
-    start_stop_btn.innerHTML="Stop";
     info_string="";
     var d=new Date();
     var h=d.getHours();
@@ -438,6 +442,15 @@ function geo_success(position){
             prev_long=position.coords.longitude;
            info_string="Current positon: lat="+position.coords.latitude+", long="+position.coords.longitude+" (accuracy "+Math.round(position.coords.accuracy,1)+"m)<br />Speed: current="+position.coords.speed+"min="+(min_speed?min_speed:"Not recorded/0")+"m/s, max="+(max_speed?max_speed:"Not recorded/0")+"m/s<br />Altitude: min="+(min_altitude?min_altitude:"Not recorded/0")+"m, max="+(max_altitude?max_altitude:"Not recorded/0")+"m (accuracy "+Math.round(position.coords.altitudeAccuracy,1)+"m)<br />last reading taken at: "+current_datetime;
         }
+var pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                          };
+                           map.setCenter(pos);
+                           document.title = position.coords.speed;
+                           var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                           marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
+                           markers.push(marker);
         setSpeed(position);
         updateSpeedChart();
         find_closest_marker(position);
@@ -490,23 +503,7 @@ function init_geo(){
     speedData.addColumn({type: 'string', role: 'style'});
 
     op=document.getElementById("output");
-    if(op){
-        start_stop_btn=document.getElementById("geo_start_stop");
-        if(start_stop_btn){
-            start_stop_btn.onclick=function(){
-                if(wpid){
-                    start_stop_btn.innerHTML="Start";
-                    navigator.geolocation.clearWatch(wpid);
-                    wpid=false;
-                }
-                else{
-                    start_stop_btn.innerHTML="Aquiring Geo Location...";get_pos();
-                }
-            }
-        }
-        else
-            op.innerHTML="ERROR: Couldn't find the start/stop button";
-    }
+
 }
 
 // Load the Visualization API and the piechart package.
