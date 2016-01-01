@@ -497,7 +497,7 @@ function get_current_position(){
 function get_pos(){
     if(!!navigator.geolocation){
 
-        wpid=navigator.geolocation.watchPosition(geo_success,geo_error,{enableHighAccuracy:false,maximumAge:0,timeout:5000});
+        wpid=navigator.geolocation.watchPosition(geo_success,geo_error,{enableHighAccuracy:false,maximumAge:0,timeout:40000});
     }
     else
         op.innerHTML="ERROR: Your Browser doesnt support the Geo Location API";
