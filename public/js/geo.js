@@ -4,7 +4,29 @@ var start_stop_btn,
 var speeds = [];
 var speedsChart = null;
 var speedData = null;
+var map = null;
+                  var chart = null;
+                  var ida = true;
 
+                  var geocoderService = null;
+                  var elevationService = null;
+                  var directionsService = null;
+
+                  var mousemarker = null;
+                  var markers = [];
+                  var polyline = null;
+                  var elevations = null;
+                  var id_watch = 0;
+                  var prevCoord = false;
+                  var sessionDistance = 0;
+                  var sessionAvgSpeed = 0;
+                  var intervalAvgSpeed = 0;
+                  var start = null;
+                  var marker;
+                  var route = [];
+                  var SAMPLES = 256;
+
+function rad(x) {return x*Math.PI/180;}
 
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
@@ -55,6 +77,345 @@ function format_time_component(time_component){
         time_component=time_component+"0";return time_component;
 }
 
+// Google maps init and stuff
+// Clear all overlays, reset the array of points, and hide the chart
+                  function reset() {
+                    if (polyline) {
+                      polyline.setMap(null);
+                    }
+
+                    for (var i in markers) {
+                      markers[i].setMap(null);
+                    }
+
+                    markers = [];
+
+                    document.getElementById('chart_div').style.display = 'none';
+                    document.getElementById('speeds_div').style.display = 'none';
+                  var locations = [
+                    ["Partida",
+                    "Partida",
+                    "-38.005022",
+                    "-57.542555",
+                    "img/largada.png"
+                    ]
+                    ];
+
+                gmarkers = [];
+
+                function createMarker(latlng, html, icon) {
+                    var marker = new google.maps.Marker({
+                        position: latlng,
+                        icon: icon,
+                        map: map
+                    });
+
+                    return marker;
+                }
+
+                for (var i = 0; i < locations.length; i++) {
+                    gmarkers[locations[i][0]] =
+                    createMarker(new google.maps.LatLng(locations[i][2], locations[i][3]), "<table style='width:100%;'><tr><td>" + locations[i][0] + "</td></tr></table>", locations[i][4]);
+                }
+
+                }
+function placeMarker(location) {
+                      marker = new google.maps.Marker({
+                          position: location,
+                          map: map
+                        });
+                      route.push(marker);
+                  }
+function plotElevation(results) {
+                    elevations = results;
+
+                    var path = [];
+                    for (var i = 0; i < results.length; i++) {
+                      path.push(elevations[i].location);
+                    }
+
+                    if (polyline) {
+                      polyline.setMap(null);
+                    }
+
+                    polyline = new google.maps.Polyline({
+                      path: path,
+                      strokeColor: "#FF0000",
+                      map: map});
+
+                  }
+
+function updateElevation() {
+                    if (markers.length > 1) {
+                      var travelMode = 'walking';
+                      if (travelMode != 'direct') {
+                        calcRoute(travelMode);
+                      } else {
+                        var latlngs = [];
+                        for (var i in markers) {
+                          latlngs.push(markers[i].getPosition())
+                        }
+                        elevationService.getElevationAlongPath({
+                          path: latlngs,
+                          samples: SAMPLES
+                        }, plotElevation);
+                      }
+                    }
+                  }
+
+                  // Submit a directions request for the path between points and an
+                  // elevation request for the path once returned
+                  function calcRoute(travelMode) {
+                    var origin = markers[0].getPosition();
+                    var destination = markers[markers.length - 1].getPosition();
+
+                    var waypoints = [];
+                    for (var i = 1; i < markers.length - 1; i++) {
+                      waypoints.push({
+                        location: markers[i].getPosition(),
+                        stopover: true
+                      });
+                    }
+
+                    var request = {
+                      origin: origin,
+                      destination: destination,
+                      waypoints: waypoints
+                    };
+
+                    switch (travelMode) {
+                      case "bicycling":
+                        request.travelMode = google.maps.DirectionsTravelMode.BICYCLING;
+                        break;
+                      case "driving":
+                        request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
+                        break;
+                      case "walking":
+                        request.travelMode = google.maps.DirectionsTravelMode.WALKING;
+                        break;
+                    }
+
+                    directionsService.route(request, function(response, status) {
+                      if (status == google.maps.DirectionsStatus.OK) {
+                        elevationService.getElevationAlongPath({
+                          path: response.routes[0].overview_path,
+                          samples: SAMPLES
+                        }, plotElevation);
+                      } else if (status == google.maps.DirectionsStatus.ZERO_RESULTS) {
+                        alert("No se encuentra ruta entre estos dos puntos");
+                      } else {
+                        alert("Fallo de direcciones");
+                      }
+                    });
+                  }
+
+ function addMarker(latlng, doQuery) {
+
+                      var marker = new google.maps.Marker({
+                        position: latlng,
+                        icon: "no",
+                        map: map,
+                      })
+
+                      google.maps.event.addListener(marker, 'dragend', function(e) {
+                        updateElevation();
+                      });
+
+                      markers.push(marker);
+
+                      if (doQuery) {
+                        updateElevation();
+                      }
+
+                  }
+
+function loadRoute() {
+                    reset();
+                    map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+                    var bounds = new google.maps.LatLngBounds();
+                    for (var i = 0; i < route.length; i++) {
+                      var latlng = new google.maps.LatLng(
+                        route[i].getPosition().lat(),
+                        route[i].getPosition().lng()
+                      );
+                      addMarker(latlng, false);
+                      bounds.extend(latlng);
+                    }
+                    updateElevation();
+                  }
+
+function BackButton(controlDiv, map) {
+
+                      // Set CSS for the control border.
+                      var controlUI = document.createElement('div');
+                      controlUI.style.backgroundColor = '#fff';
+                      controlUI.style.border = '2px solid #fff';
+                      controlUI.style.borderRadius = '3px';
+                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                      controlUI.style.cursor = 'pointer';
+                      controlUI.style.marginBottom = '22px';
+                      controlUI.style.textAlign = 'center';
+                      controlUI.title = 'Ida';
+                      controlDiv.appendChild(controlUI);
+
+                      // Set CSS for the control interior.
+                      var controlText = document.createElement('div');
+                      controlText.style.color = 'rgb(25,25,25)';
+                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      controlText.style.fontSize = '16px';
+                      controlText.style.lineHeight = '38px';
+                      controlText.style.paddingLeft = '5px';
+                      controlText.style.paddingRight = '5px';
+                      controlText.innerHTML = 'Ida';
+                      controlUI.appendChild(controlText);
+
+                      // Setup the click event listeners: simply set the map to Chicago.
+                      controlUI.addEventListener('click', function() {
+                          if (ida) {
+                            controlText.innerHTML = 'Vuelta';
+                          } else {
+                            controlText.innerHTML = 'Ida';
+                          }
+                          ida = (!ida);
+                      });
+
+                    }
+
+                  function RouteButton(controlDiv, map) {
+
+                      // Set CSS for the control border.
+                      var controlUI = document.createElement('div');
+                      controlUI.style.backgroundColor = '#fff';
+                      controlUI.style.border = '2px solid #fff';
+                      controlUI.style.borderRadius = '3px';
+                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                      controlUI.style.cursor = 'pointer';
+                      controlUI.style.marginBottom = '22px';
+                      controlUI.style.textAlign = 'center';
+                      controlUI.title = 'Route';
+                      controlDiv.appendChild(controlUI);
+
+                      // Set CSS for the control interior.
+                      var controlText = document.createElement('div');
+                      controlText.style.color = 'rgb(25,25,25)';
+                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      controlText.style.fontSize = '16px';
+                      controlText.style.lineHeight = '38px';
+                      controlText.style.paddingLeft = '5px';
+                      controlText.style.paddingRight = '5px';
+                      controlText.innerHTML = 'Route';
+                      controlUI.appendChild(controlText);
+
+                      // Setup the click event listeners: simply set the map to Chicago.
+                      controlUI.addEventListener('click', function() {
+                            loadRoute();
+                            /*if (mobileAndTabletcheck()) {
+                                $('#chart_div').height('60%');
+                                $('#speeds_div').height('30%');
+                                $('#map').height('10%');
+                            }*/
+                      });
+
+                    }
+
+function init_map(){
+    var myLatlng = new google.maps.LatLng(-38.005022,-57.542555);
+    var myOptions = {
+                      zoom: 16,
+                      center: myLatlng,
+                      mapTypeId: google.maps.MapTypeId.TERRAIN
+                    }
+                    infowindow = new google.maps.InfoWindow();
+                    map = new google.maps.Map(document.getElementById("map"), myOptions);
+                    var noPoi = [
+                    {
+                        featureType: "poi",
+                        stylers: [
+                          { visibility: "off" }
+                        ]
+                      }
+                    ];
+                    map.setOptions({styles: noPoi});
+                    var centerControlDiv = document.createElement('div');
+                    var centerControl = new BackButton(centerControlDiv, map);
+                    var backButton = new RouteButton(centerControlDiv, map);
+
+                    centerControlDiv.index = 1;
+                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+                    get_current_position();
+                    google.maps.event.addListener(map, 'click', function(event) {
+                      placeMarker(event.latLng);
+                    });
+                    google.visualization.events.addListener(chart, 'onmouseover', function(e) {
+                      if (mousemarker == null) {
+                        mousemarker = new google.maps.Marker({
+                          position: elevations[e.row].location,
+                          map: map,
+                          icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                        });
+                      } else {
+                        mousemarker.setPosition(elevations[e.row].location);
+                        map.setCenter(elevations[e.row].location);
+                      }
+                    });
+}
+
+function find_closest_marker( pos ) {
+                    var lat = pos.lat;
+                    var lng = pos.lng;
+                    var R = 6371; // radius of earth in km
+                    var distances = [];
+                    var closest = -1;
+                    var init = 0;
+                    var end = elevations.length;
+                    for( var i = 0; i < elevations.length; i++ ) {
+                            var mlat = elevations[i].location.lat();
+                            var mlng = elevations[i].location.lng();
+                            var dLat  = rad(mlat - lat);
+                            var dLong = rad(mlng - lng);
+                            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                                Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+                            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                            var d = R * c;
+                            distances[i] = d;
+                            if ( closest == -1 || d < distances[closest] ) {
+                                closest = i;
+                            }
+                    }
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'test');
+                    data.addColumn('number', 'Altura');
+                    data.addColumn({type: 'string', role: 'style'});
+
+                    if (ida){
+                        for (var i = 0; i < elevations.length; i++) {
+                            if (i<closest)
+                                data.addRow(['', elevations[i].elevation, 'color: #00ff00']);
+                            else
+                                data.addRow(['', elevations[i].elevation, 'color: #ff0000']);
+                        }
+                    } else {
+                        for (var i = 0; i < elevations.length; i++) {
+                            if (i>=closest)
+                                data.addRow(['', elevations[i].elevation, 'color: #00ff00']);
+                            else
+                                data.addRow(['', elevations[i].elevation, 'color: #ff0000']);
+                        }
+                    }
+
+                    document.getElementById('chart_div').style.display = 'block';
+                    chart.clearChart();
+                    chart.draw(data, {
+                      height: '100%',
+                      legend: 'none',
+                      titleY: 'Height',
+                      focusBorderColor: '#00ff00'
+                    });
+
+                    chart.setSelection([]);
+                    chart.setSelection([{column:1,row:closest+1}]);
+                  }
+
 function geo_success(position){
     start_stop_btn.innerHTML="Stop";
     info_string="";
@@ -79,6 +440,7 @@ function geo_success(position){
         }
         setSpeed(position);
         updateSpeedChart();
+        find_closest_marker(position);
     }
     else
         info_string="Accuracy not sufficient ("+Math.round(position.coords.accuracy,1)+"m vs "+min_accuracy+"m) - last reading taken at: "+current_datetime;if(info_string)
@@ -89,13 +451,36 @@ function geo_error(error){
         case error.TIMEOUT:op.innerHTML="Timeout!";break;
     };
 }
+function get_current_position(){
+    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function (position) {
+                            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                            marker = new google.maps.Marker({
+                              position: initialLocation,
+                              map: map,
+                              icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                            });
+                            map.setCenter(initialLocation);
+                            markers.push(marker);
+                        });
+                    }
+}
 function get_pos(){
-    if(!!navigator.geolocation)
+    if(!!navigator.geolocation){
+
         wpid=navigator.geolocation.watchPosition(geo_success,geo_error,{enableHighAccuracy:true,maximumAge:30000,timeout:27000});
+    }
     else
         op.innerHTML="ERROR: Your Browser doesnt support the Geo Location API";
 };
 function init_geo(){
+    chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    geocoderService = new google.maps.Geocoder();
+    elevationService = new google.maps.ElevationService();
+    directionsService = new google.maps.DirectionsService();
+
+    init_map();
+
 
     speedsChart = new google.visualization.AreaChart(document.getElementById('speeds_div'));
 
