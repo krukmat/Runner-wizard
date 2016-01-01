@@ -9,8 +9,8 @@
     <style type="text/css">
         html, body { height: 100%; margin: 0; padding: 0; }
         #map { height: 70%; }
-        #chart_div { height: 20%; }
-        #speeds_div { height: 20%; }
+        #chart_div { height: 15%; }
+        #speeds_div { height: 15%; }
     </style>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDl9TGC98BJn4hMIHL5o7umITbXqF2YbzQ"></script>
@@ -56,6 +56,7 @@
 
                   var marker;
                   var route = [];
+                  var returnRoute = [];
 
                   function getRandomArbitrary(min, max) {
                       return Math.random() * (max - min) + min;
@@ -81,6 +82,7 @@
                           map: map
                         });
                       route.push(marker);
+                      returnRoute.push(marker);
                   }
 
                   function mobileAndTabletcheck() {
@@ -115,7 +117,7 @@
                     var backButton = new RouteButton(centerControlDiv, map);
 
                     centerControlDiv.index = 1;
-                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+                    map.controls[google.maps.ControlPosition.TOP_RIGHT].push(centerControlDiv);
 
                     geocoderService = new google.maps.Geocoder();
                     elevationService = new google.maps.ElevationService();
@@ -202,8 +204,10 @@
                       controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
                       controlText.style.fontSize = '16px';
                       controlText.style.lineHeight = '38px';
-                      controlText.style.paddingLeft = '5px';
-                      controlText.style.paddingRight = '5px';
+                      controlText.style.paddingLeft = '20px';
+                      controlText.style.paddingRight = '20px';
+                      controlText.style.paddingBottom = '20px';
+                      controlText.style.paddingTop = '20px';
                       controlText.innerHTML = 'Ida';
                       controlUI.appendChild(controlText);
 
@@ -219,37 +223,6 @@
 
                     }
 
-                  function HideMapButton(controlDiv, map) {
-
-                      // Set CSS for the control border.
-                      var controlUI = document.createElement('div');
-                      controlUI.style.backgroundColor = '#fff';
-                      controlUI.style.border = '2px solid #fff';
-                      controlUI.style.borderRadius = '3px';
-                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
-                      controlUI.style.cursor = 'pointer';
-                      controlUI.style.marginBottom = '22px';
-                      controlUI.style.textAlign = 'center';
-                      controlUI.title = 'Hide Map';
-                      controlDiv.appendChild(controlUI);
-
-                      // Set CSS for the control interior.
-                      var controlText = document.createElement('div');
-                      controlText.style.color = 'rgb(25,25,25)';
-                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-                      controlText.style.fontSize = '16px';
-                      controlText.style.lineHeight = '38px';
-                      controlText.style.paddingLeft = '5px';
-                      controlText.style.paddingRight = '5px';
-                      controlText.innerHTML = 'Hide Map';
-                      controlUI.appendChild(controlText);
-
-                      // Setup the click event listeners: simply set the map to Chicago.
-                      controlUI.addEventListener('click', function() {
-                          $(map).hide();
-                      });
-
-                    }
 
                   function RouteButton(controlDiv, map) {
 
@@ -271,8 +244,10 @@
                       controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
                       controlText.style.fontSize = '16px';
                       controlText.style.lineHeight = '38px';
-                      controlText.style.paddingLeft = '5px';
-                      controlText.style.paddingRight = '5px';
+                      controlText.style.paddingLeft = '20px';
+                      controlText.style.paddingRight = '20px';
+                      controlText.style.paddingTop = '20px';
+                      controlText.style.paddingBottom = '20px';
                       controlText.innerHTML = 'Route';
                       controlUI.appendChild(controlText);
 
@@ -284,6 +259,13 @@
                                 $('#chart_div').height('60%');
                                 $('#speeds_div').height('30%');
                                 $('#map').height('10%');
+                            }
+                            if (navigator.geolocation) {
+                                setInterval(updatePosition, 10000);
+                              } else {
+                                // Browser doesn't support Geolocation
+                                var infoWindow = new google.maps.InfoWindow({map: map});
+                                handleLocationError(false, infoWindow, map.getCenter());
                             }
                       });
 
@@ -314,10 +296,17 @@
                     var distances = [];
                     var closest = -1;
                     var init = 0;
-                    var end = elevations.length;
-                    for( var i = 0; i < elevations.length; i++ ) {
-                            var mlat = elevations[i].location.lat();
-                            var mlng = elevations[i].location.lng();
+                    var elevationsVar = null;
+                    if (ida)
+                        elevationsVar = elevations;
+                    else
+                        elevationsVar = returnElevations;
+                    
+                    
+                    var end = elevationsVar.length;
+                    for( var i = 0; i < elevationsVar.length; i++ ) {
+                            var mlat = elevationsVar[i].location.lat();
+                            var mlng = elevationsVar[i].location.lng();
                             var dLat  = rad(mlat - lat);
                             var dLong = rad(mlng - lng);
                             var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -334,22 +323,13 @@
                     data.addColumn('number', 'Altura');
                     data.addColumn({type: 'string', role: 'style'});
 
-                    if (ida){
-                        for (var i = 0; i < elevations.length; i++) {
+                    for (var i = 0; i < elevationsVar.length; i++) {
                             if (i<closest)
-                                data.addRow(['', elevations[i].elevation, 'color: #00ff00']);
+                                data.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
                             else
-                                data.addRow(['', elevations[i].elevation, 'color: #ff0000']);
-                        }
-                    } else {
-                        for (var i = 0; i < elevations.length; i++) {
-                            if (i>=closest)
-                                data.addRow(['', elevations[i].elevation, 'color: #00ff00']);
-                            else
-                                data.addRow(['', elevations[i].elevation, 'color: #ff0000']);
-                        }
+                                data.addRow(['', elevationsVar[i].elevation, 'color: #ff0000']);
                     }
-
+                    
                     document.getElementById('chart_div').style.display = 'block';
                     chart.clearChart();
                     chart.draw(data, {
@@ -382,13 +362,25 @@
                       strokeColor: "#FF0000",
                       map: map});
 
-                    if (navigator.geolocation) {
-                        setInterval(updatePosition, 100);
-                      } else {
-                        // Browser doesn't support Geolocation
-                        var infoWindow = new google.maps.InfoWindow({map: map});
-                        handleLocationError(false, infoWindow, map.getCenter());
+                  }
+
+                  function plotReturnRouteElevation(results) {
+                    returnElevations = results;
+
+                    var path = [];
+                    for (var i = 0; i < results.length; i++) {
+                      path.push(returnElevations[i].location);
                     }
+
+                    if (polyline) {
+                      polyline.setMap(null);
+                    }
+
+                    polyline = new google.maps.Polyline({
+                      path: path,
+                      strokeColor: "#FF0000",
+                      map: map});
+
                   }
 
                   // Remove the green rollover marker when the mouse leaves the chart
@@ -440,6 +432,27 @@
                     }
                   }
 
+                  function updateReturnPathElevation() {
+                    if (markers.length > 1) {
+                      var travelMode = 'walking';
+                      if (travelMode != 'direct') {
+                        calcReturnRoute(travelMode);
+                      } else {
+                        var latlngs = [];
+                        for (var i in markers) {
+                          latlngs.push(markers[i].getPosition())
+                        }
+                        elevationService.getElevationAlongPath({
+                          path: latlngs,
+                          samples: SAMPLES
+                        }, plotReturnRouteElevation);
+                      }
+                    }
+                  }
+
+
+
+
                   // Submit a directions request for the path between points and an
                   // elevation request for the path once returned
                   function calcRoute(travelMode) {
@@ -486,6 +499,51 @@
                     });
                   }
 
+
+                  function calcReturnRoute(travelMode) {
+                    var origin = markers[0].getPosition();
+                    var destination = markers[markers.length - 1].getPosition();
+
+                    var waypoints = [];
+                    for (var i = 1; i < markers.length - 1; i++) {
+                      waypoints.push({
+                        location: markers[i].getPosition(),
+                        stopover: true
+                      });
+                    }
+
+                    var request = {
+                      origin: origin,
+                      destination: destination,
+                      waypoints: waypoints
+                    };
+
+                    switch (travelMode) {
+                      case "bicycling":
+                        request.travelMode = google.maps.DirectionsTravelMode.BICYCLING;
+                        break;
+                      case "driving":
+                        request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
+                        break;
+                      case "walking":
+                        request.travelMode = google.maps.DirectionsTravelMode.WALKING;
+                        break;
+                    }
+
+                    directionsService.route(request, function(response, status) {
+                      if (status == google.maps.DirectionsStatus.OK) {
+                        elevationService.getElevationAlongPath({
+                          path: response.routes[0].overview_path,
+                          samples: SAMPLES
+                        }, plotReturnRouteElevation);
+                      } else if (status == google.maps.DirectionsStatus.ZERO_RESULTS) {
+                        alert("No se encuentra ruta entre estos dos puntos");
+                      } else {
+                        alert("Fallo de direcciones");
+                      }
+                    });
+                  }
+
                   function loadRoute() {
                     reset();
                     map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
@@ -499,6 +557,19 @@
                       bounds.extend(latlng);
                     }
                     updateElevation();
+                    // Return Route
+                    returnRoute.reverse();
+                    reset();
+                    bounds = new google.maps.LatLngBounds();
+                    for (var i = 0; i < returnRoute.length; i++) {
+                      var latlng = new google.maps.LatLng(
+                        returnRoute[i].getPosition().lat(),
+                        returnRoute[i].getPosition().lng()
+                      );
+                      addMarker(latlng, false);
+                      bounds.extend(latlng);
+                    }
+                    updateReturnPathElevation();
                   }
 
                   function cleanupRoutes(){
