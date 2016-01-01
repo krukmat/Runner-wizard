@@ -508,7 +508,8 @@ function init_geo(){
     elevationService = new google.maps.ElevationService();
     directionsService = new google.maps.DirectionsService();
 
-    init_map();
+    //init_map();
+    get_pos();
 
 
     speedsChart = new google.visualization.AreaChart(document.getElementById('speeds_div'));
