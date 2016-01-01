@@ -469,7 +469,7 @@ var pos = {
         */
         setSpeed(position);
         updateSpeedChart();
-        find_closest_marker(position);
+        //find_closest_marker(position);
     }
     else
         info_string="Accuracy not sufficient ("+Math.round(position.coords.accuracy,1)+"m vs "+min_accuracy+"m) - last reading taken at: "+current_datetime;if(info_string)
