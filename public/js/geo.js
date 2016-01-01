@@ -97,6 +97,8 @@ function get_pos(){
 };
 function init_geo(){
 
+    speedsChart = new google.visualization.AreaChart(document.getElementById('speeds_div'));
+
     speedData = new google.visualization.DataTable();
     speedData.addColumn('string', 'test');
     speedData.addColumn('number', 'Current Speed');
