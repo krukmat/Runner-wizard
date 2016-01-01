@@ -387,7 +387,7 @@
                       map: map});
 
                     if (navigator.geolocation) {
-                        var options = {enableHighAccuracy:true,maximumAge:30000,timeout:27000};
+                        var options = {enableHighAccuracy:true,maximumAge:0,timeout:5000};
                         //navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, options);
                         setInterval(updatePosition, INTERVAL);
                       } else {
