@@ -11,6 +11,14 @@
         #map { height: 70%; }
         #chart_div { height: 15%; }
         #speeds_div { height: 15%; }
+        .portrait {
+            -webkit-transform: rotate(90deg);
+            -webkit-transform-origin: 200px 190px;
+        }
+        .portrait-onready {
+            -webkit-transform: rotate(90deg);
+            -webkit-transform-origin: 165px 150px;
+        }
     </style>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDl9TGC98BJn4hMIHL5o7umITbXqF2YbzQ"></script>
@@ -48,17 +56,19 @@
 
 
                   var SAMPLES = 256;
-                  window.addEventListener('orientationchange', function () {
-                        if (window.orientation == -90) {
-                            window.alert('-90');
-                        }
-                        if (window.orientation == 90) {
-                            window.alert('90');
-                        }
-                        if (window.orientation == 0) {
-                            window.alert('0');
-                        }
-                    }, true);
+                  $(window).bind('orientationchange', function(e, onready){
+                       if(onready){
+                           $(document.body).addClass('portrait-onready');
+                       }
+                       if (Math.abs(window.orientation) != 90){
+                           $(document.body).addClass('portrait');
+                       }
+                       else {
+                           $(document.body).removeClass('portrait').removeClass('portrait-onready');
+                       }
+                });
+                $(window).trigger('orientationchange', true); // fire the orientation change event at the start, to make sure
+
 
                   // Load the Visualization API and the piechart package.
                   google.load("visualization", "1", {packages: ["corechart"]});
