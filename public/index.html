@@ -48,6 +48,17 @@
 
 
                   var SAMPLES = 256;
+                  window.addEventListener('orientationchange', function () {
+                        if (window.orientation == -90) {
+                            window.alert('-90');
+                        }
+                        if (window.orientation == 90) {
+                            window.alert('90');
+                        }
+                        if (window.orientation == 0) {
+                            window.alert('0');
+                        }
+                    }, true);
 
                   // Load the Visualization API and the piechart package.
                   google.load("visualization", "1", {packages: ["corechart"]});
