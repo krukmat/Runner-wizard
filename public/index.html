@@ -85,7 +85,7 @@
 
 
                   function DoFullScreen() {
-                    var isInFullScreen = (document.fullScreenElement && document.fullScreenElement !==     null) ||    // alternative standard method
+                    /*var isInFullScreen = (document.fullScreenElement && document.fullScreenElement !==     null) ||    // alternative standard method
                             (document.mozFullScreen || document.webkitIsFullScreen);
 
                     var docElm = document.documentElement;
@@ -102,7 +102,9 @@
                             docElm.webkitRequestFullScreen();
                             alert("Webkit entering fullscreen!");
                         }
-                    }
+                    }*/
+                    docElm.webkitRequestFullScreen();
+                    alert("Webkit entering fullscreen!");
                 }
 
                   function getRandomArbitrary(min, max) {
