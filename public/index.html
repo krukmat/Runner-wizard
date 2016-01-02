@@ -58,7 +58,7 @@
 
                   var SAMPLES = 256;
 
-                // Hacer que siempre este a 90 al estar en portrait
+                // Hacer que siempre este a 90 al estar en portrait. TODO: Bug
                 $(window).bind('orientationchange', function(e, onready){
                        if(onready){
                            $(document.body).addClass('portrait-onready');
@@ -196,7 +196,8 @@
                           setSpeed(position);
                           var pos = {
                             lat: position.coords.latitude,
-                            lng: position.coords.longitude
+                            lng: position.coords.longitude,
+                            altitude: position.coords.altitude
                           };
                            map.setCenter(pos);
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -355,7 +356,10 @@
                             else
                                 data.addRow(['', elevationsVar[i].elevation, 'color: #ff0000']);
                     }
-                    
+
+                    // The real altitude. Just for contrast it
+                    data.addRow(['', pos.altitude, 'color: #0000FF']);
+
                     document.getElementById('chart_div').style.display = 'block';
                     chart.clearChart();
                     chart.draw(data, {
