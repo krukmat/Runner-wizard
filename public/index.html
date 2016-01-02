@@ -26,6 +26,7 @@
                   var map = null;
                   var chart = null;
                   var ida = true;
+                  var INTERVAL = 100; // Refresh Interval
 
                   var geocoderService = null;
                   var elevationService = null;
@@ -261,7 +262,7 @@
                                 $('#map').height('15%');
                             }
                             if (navigator.geolocation) {
-                                setInterval(updatePosition, 10000);
+                                setInterval(updatePosition, INTERVAL);
                               } else {
                                 // Browser doesn't support Geolocation
                                 var infoWindow = new google.maps.InfoWindow({map: map});
