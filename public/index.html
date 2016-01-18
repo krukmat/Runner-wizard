@@ -6,12 +6,13 @@
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="0"/>
     <meta name="viewport" content="minimal-ui">
+    <script type='text/javascript' src='//dsms0mj1bbhn4.cloudfront.net/assets/pub/shareaholic.js' data-shr-siteid='fd82f827c6ccb20e3ec006d703ba521c' data-cfasync='false' async='async'></script>
     <title></title>
     <style type="text/css">
         html, body { height: 100%; margin: 0; padding: 0; }
         #map { height: 70%; }
-        #chart_div { height: 15%; }
-        #speeds_div { height: 15%; }
+        #chart_div { height: 30%; }
+        #speeds_div { height: 0%; }
         .portrait {
             -webkit-transform: rotate(90deg);
             -webkit-transform-origin: 200px 190px;
@@ -54,9 +55,29 @@
                   var speeds = [];
                   var speedsChart = null;
                   var speedData = null;
+                  var totalKms = 0;
+                  var init_selection = null;
+                  var end_selection = null;
+                  var distancesSelection = [];
 
 
                   var SAMPLES = 256;
+
+                function distance(lat1, lon1, lat2, lon2, unit) {
+                    var radlat1 = Math.PI * lat1/180
+                    var radlat2 = Math.PI * lat2/180
+                    var radlon1 = Math.PI * lon1/180
+                    var radlon2 = Math.PI * lon2/180
+                    var theta = lon1-lon2
+                    var radtheta = Math.PI * theta/180
+                    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+                    dist = Math.acos(dist)
+                    dist = dist * 180/Math.PI
+                    dist = dist * 60 * 1.1515
+                    if (unit=="K") { dist = dist * 1.609344 }
+                    if (unit=="N") { dist = dist * 0.8684 }
+                    return dist
+                }
 
                 // Hacer que siempre este a 90 al estar en portrait. TODO: Bug
                 $(window).bind('orientationchange', function(e, onready){
@@ -89,16 +110,11 @@
                   }
 
                   function setSpeed(coords) {
-                    if (mobileAndTabletcheck()) {
-                        if (coords.coords.speed !== null) {
-                            // convierto de m/s a km/h => 3600/1000 = 3.6
-                            sessionAvgSpeed = coords.coords.speed * 3.6;
-                        } else {
-                            sessionAvgSpeed = 0;
-                        }
-                    }
-                    else{
-                        sessionAvgSpeed = getRandomArbitrary(0, 15);
+                    if (coords.coords.speed !== null) {
+                        // convierto de m/s a km/h => 3600/1000 = 3.6
+                        sessionAvgSpeed = coords.coords.speed * 3.6;
+                    } else {
+                        sessionAvgSpeed = 0;
                     }
                   }
 
@@ -141,6 +157,7 @@
                     var centerControlDiv = document.createElement('div');
                     var centerControl = new BackButton(centerControlDiv, map);
                     var backButton = new RouteButton(centerControlDiv, map);
+                    var clearButton = new ClearButton(centerControlDiv, map);
 
                     centerControlDiv.index = 1;
                     map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
@@ -154,6 +171,12 @@
                     speedData.addColumn('number', 'Current Speed');
                     speedData.addColumn({type: 'string', role: 'style'});
 
+
+                    if (mobileAndTabletcheck()) {
+                        INTERVAL = 100;
+                    } else {
+                        INTERVAL = 10000;
+                    }
 
                     google.maps.event.addListener(map, 'click', function(event) {
                       placeMarker(event.latLng);
@@ -171,6 +194,16 @@
                       }
                     });
 
+                    google.visualization.events.addListener(chart, 'select', function(e) {
+                        if (!init_selection)
+                            init_selection = chart.getSelection()[0];
+                        else{
+                            end_selection = chart.getSelection()[0];
+                            console.log(init_selection);
+                            console.log(end_selection);
+                        }
+                    });
+
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(function (position) {
                             initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -180,7 +213,7 @@
                               icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
                             });
                             map.setCenter(initialLocation);
-                            markers.push(marker);
+                            //markers.push(marker);
                         });
                     }
 
@@ -193,18 +226,27 @@
                   function updatePositionOK(position) {
                           clearMarkers();
                           cleanupRoutes();
-                          setSpeed(position);
                           var pos = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                            altitude: position.coords.altitude
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                                altitude: position.coords.altitude
                           };
-                           map.setCenter(pos);
-                           var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                           marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
-                           markers.push(marker);
-                           find_closest_marker(pos);
-                           updateSpeedChart();
+                          if (mobileAndTabletcheck()) {
+                              setSpeed(position);
+
+                               map.setCenter(pos);
+                               var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                               marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
+                               markers.push(marker);
+                               updateSpeedChart();
+                           }
+                           if (init_selection && end_selection){
+                             markup_selection();
+                           } else {
+                             find_closest_marker(pos);
+                           }
+
+
                   }
 
                   function updatePosition() {
@@ -282,6 +324,7 @@
                       controlUI.addEventListener('click', function() {
                             start = last = moment();
                             loadRoute();
+                            $(controlUI).hide();
                             if (mobileAndTabletcheck()) {
                                 $('#chart_div').height('50%');
                                 $('#speeds_div').height('35%');
@@ -294,6 +337,42 @@
                                 var infoWindow = new google.maps.InfoWindow({map: map});
                                 handleLocationError(false, infoWindow, map.getCenter());
                             }
+                      });
+
+                    }
+
+                  function ClearButton(controlDiv, map) {
+
+                      // Set CSS for the control border.
+                      var controlUI = document.createElement('div');
+                      controlUI.style.backgroundColor = '#fff';
+                      controlUI.style.border = '2px solid #fff';
+                      controlUI.style.borderRadius = '3px';
+                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                      controlUI.style.cursor = 'pointer';
+                      controlUI.style.marginBottom = '22px';
+                      controlUI.style.textAlign = 'center';
+                      controlUI.title = 'Clear';
+                      controlDiv.appendChild(controlUI);
+
+                      // Set CSS for the control interior.
+                      var controlText = document.createElement('div');
+                      controlText.style.color = 'rgb(25,25,25)';
+                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      controlText.style.fontSize = '16px';
+                      controlText.style.lineHeight = '38px';
+                      controlText.style.paddingLeft = '20px';
+                      controlText.style.paddingRight = '20px';
+                      controlText.style.paddingTop = '20px';
+                      controlText.style.paddingBottom = '20px';
+                      controlText.innerHTML = 'Clear Selection';
+                      controlUI.appendChild(controlText);
+
+                      // Setup the click event listeners: simply set the map to Chicago.
+                      controlUI.addEventListener('click', function() {
+                            init_selection = null;
+                            end_selection = null;
+
                       });
 
                     }
@@ -316,6 +395,64 @@
                     });
                   }
 
+                  function playSound(el, soundfile) {
+                      if (el.mp3) {
+                          if(el.mp3.paused) el.mp3.play();
+                          else el.mp3.pause();
+                      } else {
+                          el.mp3 = new Audio(soundfile);
+                          el.mp3.play();
+                      }
+                  }
+
+                  function checkNextChangeInTerrain(elevations, currentIndex){
+
+
+                  }
+
+                  function markup_selection() {
+                    var init_selection_index = init_selection.row;
+                    var end_selection_index = end_selection.row;
+                    var elevationsVar = null;
+                    if (ida)
+                        elevationsVar = elevations;
+                    else
+                        elevationsVar = returnElevations;
+
+                    var data = new google.visualization.DataTable();
+                    data.addColumn('string', 'test');
+                    data.addColumn('number', 'Altura');
+                    data.addColumn({type: 'string', role: 'style'});
+                    distancesSelection = []
+
+                    for (var i = 0; i < elevationsVar.length; i++) {
+                            if (i>=init_selection_index && i<=end_selection_index){
+                                data.addRow(['', elevationsVar[i].elevation, 'color: #0000FF']);
+                                distancesSelection.push(elevationsVar[i]);
+                            }else{
+                                data.addRow(['', elevationsVar[i].elevation, 'color: #000000']);
+                            }
+
+                    }
+
+                    var totalDistanceSelected = 0;
+                    for (var i = init_selection_index; i < end_selection_index; i++)
+                        totalDistanceSelected+=distance(elevationsVar[i].location.lat(), elevationsVar[i].location.lng(), elevationsVar[i+1].location.lat(), elevationsVar[i+1].location.lng(), 'K');
+
+                    document.getElementById('chart_div').style.display = 'block';
+                    chart.clearChart();
+                    chart.draw(data, {
+                      height: '100%',
+                      legend: 'none',
+                      titleY: 'Distance: '+totalDistanceSelected+' KMS',
+                      focusBorderColor: '#00ff00'
+                    });
+
+                    chart.setSelection([]);
+
+
+                  }
+
                   function find_closest_marker( pos ) {
                     var lat = pos.lat;
                     var lng = pos.lng;
@@ -328,8 +465,7 @@
                         elevationsVar = elevations;
                     else
                         elevationsVar = returnElevations;
-                    
-                    
+
                     var end = elevationsVar.length;
                     for( var i = 0; i < elevationsVar.length; i++ ) {
                             var mlat = elevationsVar[i].location.lat();
@@ -362,12 +498,15 @@
                             }
 
                     }
+                    // find the next change in terrain: hill, plateau or sheer => Do a notification in voice
+                    checkNextChangeInTerrain(elevationsVar, closest);
+
                     document.getElementById('chart_div').style.display = 'block';
                     chart.clearChart();
                     chart.draw(data, {
                       height: '100%',
                       legend: 'none',
-                      titleY: 'Height',
+                      titleY: 'Elevation',
                       focusBorderColor: '#00ff00'
                     });
 
@@ -519,6 +658,14 @@
 
                     directionsService.route(request, function(response, status) {
                       if (status == google.maps.DirectionsStatus.OK) {
+                        // calculate total distance: response.routes[0].legs.distance.value (meters)
+                        for (var i=0;i<response.routes[0].legs.length; i++) {
+                            var distance = response.routes[0].legs[i].distance.value;
+                            totalKms+=distance;
+                        }
+                        // convert total to meters to kms
+                        totalKms*= 0.001;
+                        document.title = totalKms + ' Kms';
                         elevationService.getElevationAlongPath({
                           path: response.routes[0].overview_path,
                           samples: SAMPLES
