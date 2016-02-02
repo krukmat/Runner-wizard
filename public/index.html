@@ -88,11 +88,11 @@
                       return Math.random() * (max - min) + min;
                   }
 
-                  function setSpeed(coords) {
+                  function setSpeed(position) {
                     if (mobileAndTabletcheck()) {
-                        if (coords.coords.speed !== null) {
+                        if (position.coords.speed !== null) {
                             // convierto de m/s a km/h => 3600/1000 = 3.6
-                            sessionAvgSpeed = coords.coords.speed * 3.6;
+                            sessionAvgSpeed = position.coords.speed * 3.6;
                         } else {
                             sessionAvgSpeed = 0;
                         }
@@ -204,7 +204,7 @@
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
                            find_closest_marker(pos);
-                           updateSpeedChart(position);
+                           updateSpeedChart();
                   }
 
                   function updatePosition() {
