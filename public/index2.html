@@ -127,8 +127,8 @@
                     speedData.addColumn({type: 'string', role: 'style'});
 
                     if (navigator.geolocation) {
-                      wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, {enableHighAccuracy:true,maximumAge:30000,timeout:27000});
-                      // setInterval(updatePosition, INTERVAL);
+                      //wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, {enableHighAccuracy:true,maximumAge:30000,timeout:27000});
+                      setInterval(updatePosition, INTERVAL);
                     } else {
                       // Browser doesn't support Geolocation
                       var infoWindow = new google.maps.InfoWindow({map: map});
@@ -147,7 +147,7 @@
                   }
 
                   function updatePosition() {
-                        navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition);
+                        navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition, {enableHighAccuracy:true,maximumAge:30000,timeout:27000});
                   }
 
                   function BackButton(controlDiv, map) {
