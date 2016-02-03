@@ -204,7 +204,7 @@
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
                            find_closest_marker(pos);
-                           updateSpeedChart();
+                           updateSpeedChart(position);
                   }
 
                   function updatePosition() {
@@ -306,21 +306,16 @@
 
                   function rad(x) {return x*Math.PI/180;}
 
-                  function updateSpeedChart(){
-                    // get the last 400 rows only
-                    if (speedData.getNumberOfRows() > 400) {
-                        speedData.removeRow(0);
+                  function updateSpeedChart(position){
+                    $("#speeds_div").html('Latitude: '          + position.coords.latitude          + '<br>' +
+                          'Longitude: '         + position.coords.longitude         + '<br>' +
+                          'Altitude: '          + position.coords.altitude          + '<br>' +
+                          'Accuracy: '          + position.coords.accuracy          + '<br>' +
+                          'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '<br>' +
+                          'Heading: '           + position.coords.heading           + '<br>' +
+                          'Speed: '             + position.coords.speed             + '<br>' +
+                          'Timestamp: '         + position.timestamp                + '<br>');
                     }
-                    speedData.addRow(['', sessionAvgSpeed, 'color: #0000FF']);
-                    document.getElementById('speeds_div').style.display = 'block';
-                    speedsChart.clearChart();
-                    speedsChart.draw(speedData, {
-                      height: '100%',
-                      legend: 'none',
-                      titleY: 'Current Speed:'+sessionAvgSpeed,
-                      focusBorderColor: '#00ff00'
-                    });
-                  }
 
                   function find_closest_marker( pos ) {
                     var lat = pos.lat;
