@@ -9,9 +9,9 @@
     <title></title>
     <style type="text/css">
         html, body { height: 100%; margin: 0; padding: 0; }
-        #map { height: 70%; }
-        #chart_div { height: 15%; }
-        #speeds_div { height: 15%; }
+        #map { height: 0%; }
+        #chart_div { height: 0%; }
+        #speeds_div { height: 100%; }
         .portrait {
             -webkit-transform: rotate(90deg);
             -webkit-transform-origin: 200px 190px;
@@ -118,70 +118,19 @@
                   }
 
                   function initialize() {
-                    var myLatlng = new google.maps.LatLng(-38.005022,-57.542555);
-                    var myOptions = {
-                      zoom: 16,
-                      center: myLatlng,
-                      mapTypeId: google.maps.MapTypeId.TERRAIN
-                    }
-                    infowindow = new google.maps.InfoWindow();
-                    map = new google.maps.Map(document.getElementById("map"), myOptions);
-                    var noPoi = [
-                    {
-                        featureType: "poi",
-                        stylers: [
-                          { visibility: "off" }
-                        ]
-                      }
-                    ];
-                    map.setOptions({styles: noPoi});
-                    chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-                    speedsChart = new google.visualization.AreaChart(document.getElementById('speeds_div'));
-
-                    var centerControlDiv = document.createElement('div');
-                    var centerControl = new BackButton(centerControlDiv, map);
-                    var backButton = new RouteButton(centerControlDiv, map);
-
-                    centerControlDiv.index = 1;
-                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
-
-                    geocoderService = new google.maps.Geocoder();
-                    elevationService = new google.maps.ElevationService();
-                    directionsService = new google.maps.DirectionsService();
 
                     speedData = new google.visualization.DataTable();
                     speedData.addColumn('string', 'test');
                     speedData.addColumn('number', 'Current Speed');
                     speedData.addColumn({type: 'string', role: 'style'});
 
-
-                    google.maps.event.addListener(map, 'click', function(event) {
-                      placeMarker(event.latLng);
-                    });
-                    google.visualization.events.addListener(chart, 'onmouseover', function(e) {
-                      if (mousemarker == null) {
-                        mousemarker = new google.maps.Marker({
-                          position: elevations[e.row].location,
-                          map: map,
-                          icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                        });
-                      } else {
-                        mousemarker.setPosition(elevations[e.row].location);
-                        map.setCenter(elevations[e.row].location);
-                      }
-                    });
-
                     if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(function (position) {
-                            initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                            marker = new google.maps.Marker({
-                              position: initialLocation,
-                              map: map,
-                              icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-                            });
-                            map.setCenter(initialLocation);
-                            markers.push(marker);
-                        });
+                      // wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition);
+                      setInterval(updatePosition, INTERVAL);
+                    } else {
+                      // Browser doesn't support Geolocation
+                      var infoWindow = new google.maps.InfoWindow({map: map});
+                      handleLocationError(false, infoWindow, map.getCenter());
                     }
 
                   }
@@ -191,20 +140,8 @@
                   }
 
                   function updatePositionOK(position) {
-                          clearMarkers();
-                          cleanupRoutes();
                           setSpeed(position);
-                          var pos = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                            altitude: position.coords.altitude
-                          };
-                           map.setCenter(pos);
-                           var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                           marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
-                           markers.push(marker);
-                           find_closest_marker(pos);
-                           updateSpeedChart();
+                          updateSpeedChart();
                   }
 
                   function updatePosition() {
@@ -291,14 +228,7 @@
                                 $('#speeds_div').height('35%');
                                 $('#map').height('15%');
                             }
-                            if (navigator.geolocation) {
-                                // wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition);
-                                setInterval(updatePosition, INTERVAL);
-                              } else {
-                                // Browser doesn't support Geolocation
-                                var infoWindow = new google.maps.InfoWindow({map: map});
-                                handleLocationError(false, infoWindow, map.getCenter());
-                            }
+
                       });
 
                     }
