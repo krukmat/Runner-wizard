@@ -127,7 +127,7 @@
                     speedData.addColumn({type: 'string', role: 'style'});
 
                     if (navigator.geolocation) {
-                      wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition);
+                      wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, {enableHighAccuracy:true,maximumAge:30000,timeout:27000});
                       // setInterval(updatePosition, INTERVAL);
                     } else {
                       // Browser doesn't support Geolocation
