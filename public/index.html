@@ -288,13 +288,13 @@
                                 $('#map').height('15%');
                             }
                             if (navigator.geolocation) {
-                                // setInterval(updatePosition, INTERVAL);
-                                options = {
+                                setInterval(updatePosition, INTERVAL);
+                                /*options = {
                                   enableHighAccuracy: false,
                                   timeout: 5000,
                                   maximumAge: 0
                                 };
-                                navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, options);
+                                navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, options);*/
                               } else {
                                 // Browser doesn't support Geolocation
                                 var infoWindow = new google.maps.InfoWindow({map: map});
