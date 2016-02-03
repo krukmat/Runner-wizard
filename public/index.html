@@ -307,6 +307,7 @@
                   function rad(x) {return x*Math.PI/180;}
 
                   function updateSpeedChart(position){
+                    // get the last 400 rows only
                     $("#speeds_div").html('Latitude: '          + position.coords.latitude          + '<br>' +
                           'Longitude: '         + position.coords.longitude         + '<br>' +
                           'Altitude: '          + position.coords.altitude          + '<br>' +
@@ -315,7 +316,9 @@
                           'Heading: '           + position.coords.heading           + '<br>' +
                           'Speed: '             + position.coords.speed             + '<br>' +
                           'Timestamp: '         + position.timestamp                + '<br>');
-                    }
+
+                    document.getElementById('speeds_div').style.display = 'block';
+                  }
 
                   function find_closest_marker( pos ) {
                     var lat = pos.lat;
