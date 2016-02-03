@@ -35,7 +35,7 @@
                   var map = null;
                   var chart = null;
                   var ida = true;
-                  var INTERVAL = 500; // Refresh Interval
+                  var INTERVAL = 100; // Refresh Interval
 
                   var geocoderService = null;
                   var elevationService = null;
@@ -204,7 +204,7 @@
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
                            find_closest_marker(pos);
-                           updateSpeedChart(position);
+                           updateSpeedChart();
                   }
 
                   function updatePosition() {
@@ -288,13 +288,7 @@
                                 $('#map').height('15%');
                             }
                             if (navigator.geolocation) {
-                                //setInterval(updatePosition, INTERVAL);
-                                options = {
-                                  enableHighAccuracy: false,
-                                  timeout: 5000,
-                                  maximumAge: 0
-                                };
-                                navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, options);
+                                setInterval(updatePosition, INTERVAL);
                               } else {
                                 // Browser doesn't support Geolocation
                                 var infoWindow = new google.maps.InfoWindow({map: map});
@@ -306,15 +300,20 @@
 
                   function rad(x) {return x*Math.PI/180;}
 
-                  function updateSpeedChart(position){
+                  function updateSpeedChart(){
                     // get the last 400 rows only
-                    $("#speeds_div").html('Latitude: '          + position.coords.latitude          + '<br>' +
-                          'Longitude: '         + position.coords.longitude         + '<br>' +
-                          'Altitude: '          + position.coords.altitude          + '<br>' +
-                          'Speed: '             + position.coords.speed             + '<br>' +
-                          'Timestamp: '         + position.timestamp                + '<br>');
-
+                    if (speedData.getNumberOfRows() > 400) {
+                        speedData.removeRow(0);
+                    }
+                    speedData.addRow(['', sessionAvgSpeed, 'color: #0000FF']);
                     document.getElementById('speeds_div').style.display = 'block';
+                    speedsChart.clearChart();
+                    speedsChart.draw(speedData, {
+                      height: '100%',
+                      legend: 'none',
+                      titleY: 'Current Speed:'+sessionAvgSpeed,
+                      focusBorderColor: '#00ff00'
+                    });
                   }
 
                   function find_closest_marker( pos ) {
