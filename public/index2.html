@@ -127,8 +127,8 @@
                     speedData.addColumn({type: 'string', role: 'style'});
 
                     if (navigator.geolocation) {
-                      // wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition);
-                      setInterval(updatePosition, INTERVAL);
+                      wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition);
+                      // setInterval(updatePosition, INTERVAL);
                     } else {
                       // Browser doesn't support Geolocation
                       var infoWindow = new google.maps.InfoWindow({map: map});
