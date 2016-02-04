@@ -292,7 +292,7 @@
                                 $('#map').height('15%');
                             }
                             if (navigator.geolocation) {
-                                wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, { enableHighAccuracy: false, timeout: 5000, maximumAge: 0});
+                                wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0});
                               } else {
                                 // Browser doesn't support Geolocation
                                 var infoWindow = new google.maps.InfoWindow({map: map});
