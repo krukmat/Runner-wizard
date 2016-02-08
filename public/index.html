@@ -202,7 +202,6 @@
                             lng: position.coords.longitude,
                             altitude: position.coords.altitude
                           };
-                           map.setCenter(pos);
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
