@@ -62,9 +62,9 @@
                   var SAMPLES = 256;
 
                   $(function() {
-                    $('#tabs-1').css('height', '800px');
-                    $('#tabs-2').css('height', '800px');
-                    $('#tabs-3').css('height', '800px');
+                    $('#tabs-1').css('height', '1200px');
+                    $('#tabs-2').css('height', '1200px');
+                    $('#tabs-3').css('height', '1200px');
                     $( "#tabs" ).tabs();
                   });
 
@@ -300,11 +300,6 @@
                       controlUI.addEventListener('click', function() {
                             start = last = moment();
                             loadRoute();
-                            if (mobileAndTabletcheck()) {
-                                $('#chart_div').height('50%');
-                                $('#speeds_div').height('35%');
-                                $('#map').height('15%');
-                            }
                             if (navigator.geolocation) {
                                 wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0});
                               } else {
