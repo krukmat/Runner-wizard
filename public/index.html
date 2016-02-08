@@ -70,21 +70,6 @@
                   });
 
 
-                // Hacer que siempre este a 90 al estar en portrait. TODO: Bug
-                $(window).bind('orientationchange', function(e, onready){
-                       if(onready){
-                           $(document.body).addClass('portrait-onready');
-                       }
-                       if (Math.abs(window.orientation) != 90){
-                           $(document.body).addClass('portrait');
-                       }
-                       else {
-                           $(document.body).removeClass('portrait').removeClass('portrait-onready');
-                       }
-                });
-                $(window).trigger('orientationchange', true); // fire the orientation change event at the start, to make sure
-
-
                   // Load the Visualization API and the piechart package.
                   google.load("visualization", "1", {packages: ["corechart"]});
 
