@@ -140,10 +140,13 @@
 
                     var centerControlDiv = document.createElement('div');
                     var centerControl = new BackButton(centerControlDiv, map);
-                    var backButton = new RouteButton(centerControlDiv, map);
+                    var centerControlDiv2 = document.createElement('div');
+                    var backButton = new RouteButton(centerControlDiv2, map);
 
                     centerControlDiv.index = 1;
-                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+                    centerControlDiv2.index = 2;
+                    map.controls[google.maps.ControlPosition.TOP_LEFT].push(centerControlDiv);
+                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv2);
 
                     geocoderService = new google.maps.Geocoder();
                     elevationService = new google.maps.ElevationService();
