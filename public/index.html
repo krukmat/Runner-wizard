@@ -10,17 +10,6 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <style type="text/css">
         html, body { height: 100%; margin: 0; padding: 0; }
-        #map { height: 70%; }
-        #chart_div { height: 15%; }
-        #speeds_div { height: 15%; }
-        .portrait {
-            -webkit-transform: rotate(90deg);
-            -webkit-transform-origin: 200px 190px;
-        }
-        .portrait-onready {
-            -webkit-transform: rotate(90deg);
-            -webkit-transform-origin: 165px 150px;
-        }
     </style>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDl9TGC98BJn4hMIHL5o7umITbXqF2YbzQ"></script>
@@ -38,7 +27,6 @@
                   var map = null;
                   var chart = null;
                   var ida = true;
-                  var INTERVAL = 100; // Refresh Interval
 
                   var geocoderService = null;
                   var elevationService = null;
@@ -161,6 +149,7 @@
                     google.maps.event.addListener(map, 'click', function(event) {
                       placeMarker(event.latLng);
                     });
+
                     google.visualization.events.addListener(chart, 'onmouseover', function(e) {
                       if (mousemarker == null) {
                         mousemarker = new google.maps.Marker({
