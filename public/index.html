@@ -116,6 +116,8 @@
                     $('#tabs-1').css('width', '100%');
                     $('#tabs-2').css('height', '1200px');
                     $('#tabs-2').css('width', '100%');
+                    $('#tabs-3').css('height', '1200px');
+                    $('#tabs-3').css('width', '100%');
                     $( "#tabs" ).tabs();
                   });
 
@@ -719,12 +721,11 @@
     </script>
 </head>
 <body>
-<button id="authorize-button" style="visibility: hidden">Authorize</button>
-<div id="content"></div>
 <div id="tabs">
   <ul>
     <li><a href="#tabs-1">Map</a></li>
     <li><a href="#tabs-2">Data</a></li>
+    <li><a href="#tabs-3">Load route</a></li>
   </ul>
   <div id="tabs-1">
     <div id="map"></div>
@@ -732,6 +733,10 @@
   <div id="tabs-2">
     <div id="speeds_div"></div>
     <div id="chart_div"></div>
+  </div>
+  <div id="tabs-3">
+      <button id="authorize-button" style="visibility: hidden">Authorize</button>
+      <div id="content"></div>
   </div>
 </div>
 </body>
