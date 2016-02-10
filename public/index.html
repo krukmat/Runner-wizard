@@ -76,7 +76,6 @@
             });
         }
     </script>
-    <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
 
     <script type="text/javascript" src="js/moment.js"></script>
     <script>
@@ -176,6 +175,7 @@
                       center: myLatlng,
                       mapTypeId: google.maps.MapTypeId.TERRAIN
                     }
+                    makeRequest(); // Google drive
                     infowindow = new google.maps.InfoWindow();
                     map = new google.maps.Map(document.getElementById("map"), myOptions);
                     var noPoi = [
