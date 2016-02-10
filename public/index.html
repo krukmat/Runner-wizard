@@ -51,17 +51,6 @@
 
                   var SAMPLES = 256;
 
-                  $(function() {
-                    $('#tabs-1').css('height', '1000px');
-                    $('#tabs-1').css('width', '100%');
-                    $('#tabs-2').css('height', '1200px');
-                    $('#tabs-2').css('width', '100%');
-                    $('#tabs-3').css('height', '1200px');
-                    $('#tabs-3').css('width', '100%');
-                    $( "#tabs" ).tabs();
-                  });
-
-
                   // Load the Visualization API and the piechart package.
                   google.load("visualization", "1", {packages: ["corechart"]});
 
@@ -110,6 +99,15 @@
                   }
 
                   function initialize() {
+                    $('#tabs-1').css('height', '1000px');
+                    $('#map').css('height', '100%');
+                    $('#tabs-1').css('width', '100%');
+                    $('#tabs-2').css('height', '1200px');
+                    $('#tabs-2').css('width', '100%');
+                    $('#tabs-3').css('height', '1200px');
+                    $('#tabs-3').css('width', '100%');
+                    $( "#tabs" ).tabs();
+
                     var myLatlng = new google.maps.LatLng(-38.005022,-57.542555);
                     var myOptions = {
                       zoom: 16,
