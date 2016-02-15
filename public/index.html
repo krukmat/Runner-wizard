@@ -168,6 +168,7 @@
                       }
                     });
 
+
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(function (position) {
                             initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
@@ -188,6 +189,7 @@
                   }
 
                   function updatePositionOK(position) {
+                          save();
                           clearMarkers();
                           cleanupRoutes();
                           setSpeed(position);
@@ -678,6 +680,7 @@
                 }
 
                 function save() {
+                    console.log('saving');
                     if(typeof(Storage) !== "undefined") {
                         localStorage.setItem('speed', JSON.stringify(sessionSpeeds));
                         localStorage.setItem('route', JSON.stringify(originalRoute));
