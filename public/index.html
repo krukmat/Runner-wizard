@@ -260,7 +260,7 @@
                       for (var i=0; i< locations.length; i++)
                         placeMarker(locations[i])
                     }
-                    loadRoute(loadFromExternal);
+                    loadRoute();
                     if (navigator.geolocation) {
                        wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0});
                     } else {
@@ -588,7 +588,7 @@
                     });
                   }
 
-                  function loadRoute(loadFromExternal) {
+                  function loadRoute() {
                     reset();
                     map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
                     var bounds = new google.maps.LatLngBounds();
