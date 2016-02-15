@@ -338,43 +338,44 @@
                     else
                         elevationsVar = returnElevations;
 
-
-                    var end = elevationsVar.length;
-                    for( var i = 0; i < elevationsVar.length; i++ ) {
-                            if (typeof elevationsVar[i].location.lat == 'function') {
-                              var mlat = elevationsVar[i].location.lat();
-                              var mlng = elevationsVar[i].location.lng();
-                            } else {
-                              var mlat = elevationsVar[i].location.lat;
-                              var mlng = elevationsVar[i].location.lng;
-                            }
-                            var dLat  = rad(mlat - lat);
-                            var dLong = rad(mlng - lng);
-                            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                                Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
-                            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                            var d = R * c;
-                            distances[i] = d;
-                            if ( closest == -1 || d < distances[closest] ) {
-                                closest = i;
-                            }
+                    if (elevationsVar !== null) {
+                        for( var i = 0; i < elevationsVar.length; i++ ) {
+                                if (typeof elevationsVar[i].location.lat == 'function') {
+                                  var mlat = elevationsVar[i].location.lat();
+                                  var mlng = elevationsVar[i].location.lng();
+                                } else {
+                                  var mlat = elevationsVar[i].location.lat;
+                                  var mlng = elevationsVar[i].location.lng;
+                                }
+                                var dLat  = rad(mlat - lat);
+                                var dLong = rad(mlng - lng);
+                                var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                                    Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+                                var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                                var d = R * c;
+                                distances[i] = d;
+                                if ( closest == -1 || d < distances[closest] ) {
+                                    closest = i;
+                                }
+                        }
                     }
                     altimetryData = new google.visualization.DataTable();
                     altimetryData.addColumn('string', 'test');
                     altimetryData.addColumn('number', 'Altura');
                     altimetryData.addColumn({type: 'string', role: 'style'});
-
-                    for (var i = 0; i < elevationsVar.length; i++) {
-                            if (i<closest)
-                                altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
-                            else{
-                                if (i> closest)
-                                    altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #ff0000']);
-                                 else{
+                    if (elevationsVar !== null) {
+                        for (var i = 0; i < elevationsVar.length; i++) {
+                                if (i<closest)
                                     altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
-                                 }
-                            }
+                                else{
+                                    if (i> closest)
+                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #ff0000']);
+                                     else{
+                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
+                                     }
+                                }
 
+                        }
                     }
                     document.getElementById('chart_div').style.display = 'block';
                     chart.clearChart();
