@@ -46,6 +46,7 @@
                   var speedsChart = null;
                   var speedData = null;
                   var sessionSpeeds = [];
+                  var returnElevations = null;
 
 
                   var SAMPLES = 256;
@@ -189,7 +190,6 @@
                   }
 
                   function updatePositionOK(position) {
-                          save();
                           clearMarkers();
                           cleanupRoutes();
                           setSpeed(position);
@@ -203,6 +203,7 @@
                            markers.push(marker);
                            find_closest_marker(pos);
                            updateSpeedChart();
+                           save();
                   }
 
                   function updatePosition() {
@@ -261,8 +262,9 @@
                       // load the positions
                       for (var i=0; i< locations.length; i++)
                         placeMarker(locations[i])
+                      plotSavedElevation(elevations);
                     }
-                    loadRoute();
+                    loadRoute(loadFromExternal);
                     if (navigator.geolocation) {
                        wpid=navigator.geolocation.watchPosition(updatePositionOK, failureGetPosition, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0});
                     } else {
@@ -388,6 +390,20 @@
 
                     chart.setSelection([]);
                     chart.setSelection([{column:1,row:closest+1}]);
+                  }
+
+                  function plotSavedElevation(elevations) {
+                    var path = [];
+                    for (var i = 0; i < elevations.length; i++) {
+                      path.push(new google.maps.LatLng(elevations[i].location.lat, elevations[i].location.lng));
+                    }
+                    if (polyline) {
+                      polyline.setMap(null);
+                    }
+                    polyline = new google.maps.Polyline({
+                      path: path,
+                      strokeColor: "#FF0000",
+                      map: map});
                   }
 
                   // Takes an array of ElevationResult objects, draws the path on the map
@@ -591,8 +607,10 @@
                     });
                   }
 
-                  function loadRoute() {
-                    reset();
+                  function loadRoute(loadFromExternal) {
+                    if (loadFromExternal === false) {
+                        reset();
+                    }
                     map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
                     var bounds = new google.maps.LatLngBounds();
                     for (var i = 0; i < route.length; i++) {
@@ -604,19 +622,21 @@
                       bounds.extend(latlng);
                     }
 
-                    updateElevation();
-                    // Return Route
-                    returnRoute.reverse();
-                    reset();
-                    bounds = new google.maps.LatLngBounds();
-                    for (var i = 0; i < returnRoute.length; i++) {
-                      var latlng = new google.maps.LatLng(
-                      returnRoute[i].getPosition().lat(),
-                      returnRoute[i].getPosition().lng());
-                      addMarker(latlng, false);
-                      bounds.extend(latlng);
+                    if (loadFromExternal === false) {
+                        updateElevation();
+                        // Return Route
+                        returnRoute.reverse();
+                        reset();
+                        bounds = new google.maps.LatLngBounds();
+                        for (var i = 0; i < returnRoute.length; i++) {
+                          var latlng = new google.maps.LatLng(
+                          returnRoute[i].getPosition().lat(),
+                          returnRoute[i].getPosition().lng());
+                          addMarker(latlng, false);
+                          bounds.extend(latlng);
+                        }
+                        updateReturnPathElevation();
                     }
-                    updateReturnPathElevation();
                   }
 
                   function cleanupRoutes(){
@@ -685,6 +705,8 @@
                     if(typeof(Storage) !== "undefined") {
                         localStorage.setItem('speed', JSON.stringify(sessionSpeeds));
                         localStorage.setItem('route', JSON.stringify(originalRoute));
+                        localStorage.setItem('elevations', JSON.stringify(elevations));
+                        localStorage.setItem('returnElevations', JSON.stringify(returnElevations));
                     } else {
                         console.log('Sorry not available in your browser')
                     }
@@ -694,6 +716,8 @@
                     if(typeof(Storage) !== "undefined") {
                         sessionSpeeds = JSON.parse(localStorage.getItem('speed'));
                         locations = JSON.parse(localStorage.getItem('route'));
+                        elevations = JSON.parse(localStorage.getItem('elevations'));
+                        returnElevations = JSON.parse(localStorage.getItem('returnElevations'));
                         initSession(true);
                     } else {
                         console.log('Sorry not available in your browser')
