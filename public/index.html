@@ -733,6 +733,8 @@
                 function save() {
                     console.log('saving');
                     if(typeof(Storage) !== "undefined") {
+                        if (sessionSpeeds.length > 50)
+                            sessionSpeeds = sessionSpeeds.slice(50);
                         localStorage.setItem('speed', JSON.stringify(sessionSpeeds));
                         localStorage.setItem('route', JSON.stringify(originalRoute));
                         localStorage.setItem('elevations', JSON.stringify(elevations));
