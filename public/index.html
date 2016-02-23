@@ -12,6 +12,7 @@
         html, body { height: 100%; margin: 0; padding: 0; }
         #tabs { position: relative; }
         #speedometer { position: absolute; top: 70px; left: 840px; z-index: 99; }
+        #totalDistance { position: absolute; top: 70px; left: 1040px; z-index: 99; }
     </style>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDl9TGC98BJn4hMIHL5o7umITbXqF2YbzQ"></script>
@@ -47,6 +48,7 @@
                   var speedData = null;
                   var sessionSpeeds = [];
                   var returnElevations = null;
+                  var totalDistance = 0;
 
 
 
@@ -90,6 +92,23 @@
                       dataSpeedometer.setValue(0, 1, sessionAvgSpeed.toFixed(2));
                       chartSpeedometer.draw(dataSpeedometer, options);
                     }, 30000);
+                  }
+
+                  function loadDistanceGauge() {
+                    var dataDistance = google.visualization.arrayToDataTable([
+                      ['Label', 'Value'],
+                      ['Distance(km)', totalDistance],
+                    ]);
+                    var options = {
+                       width: 400, height: 180,
+                       max: totalDistance
+                    };
+
+                    // TODO: configurable
+                    var chartDistancemeter = new google.visualization.Gauge(document.getElementById('totalDistance'));
+
+                    chartDistancemeter.draw(dataDistance, options);
+
                   }
 
 
@@ -580,6 +599,12 @@
 
                     directionsService.route(request, function(response, status) {
                       if (status == google.maps.DirectionsStatus.OK) {
+                        for (var j=0; j<response.routes[0].legs.length; j++){
+                            totalDistance+=response.routes[0].legs[j].distance.value;
+                        }
+                        totalDistance /= 1000;
+                        console.log(totalDistance);
+                        loadDistanceGauge();
                         elevationService.getElevationAlongPath({
                           path: response.routes[0].overview_path,
                           samples: SAMPLES
@@ -666,7 +691,10 @@
                           bounds.extend(latlng);
                         }
                         updateReturnPathElevation();
+                    } else {
+                        loadDistanceGauge();
                     }
+
                   }
 
                   function cleanupRoutes(){
@@ -739,6 +767,7 @@
                         localStorage.setItem('route', JSON.stringify(originalRoute));
                         localStorage.setItem('elevations', JSON.stringify(elevations));
                         localStorage.setItem('returnElevations', JSON.stringify(returnElevations));
+                        localStorage.setItem('totalDistance', JSON.stringify(totalDistance));
                     } else {
                         console.log('Sorry not available in your browser')
                     }
@@ -750,6 +779,7 @@
                         locations = JSON.parse(localStorage.getItem('route'));
                         elevations = JSON.parse(localStorage.getItem('elevations'));
                         returnElevations = JSON.parse(localStorage.getItem('returnElevations'));
+                        totalDistance = JSON.parse(localStorage.getItem('totalDistance'));
                         initSession(true);
                     } else {
                         console.log('Sorry not available in your browser')
@@ -766,9 +796,11 @@
   </ul>
   <div id="tabs-1">
     <div id="map"></div>
+    <div id="totalDistance"></div>
     <div id="speedometer"></div>
   </div>
   <div id="tabs-2">
+
     <div id="speeds_div"></div>
     <div id="chart_div"></div>
   </div>
