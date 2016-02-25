@@ -18,6 +18,7 @@
     <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDl9TGC98BJn4hMIHL5o7umITbXqF2YbzQ"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/routeCreator.js"></script>
 
     <script type="text/javascript" src="js/moment.js"></script>
     <script>
@@ -49,6 +50,7 @@
                   var sessionSpeeds = [];
                   var returnElevations = null;
                   var totalDistance = 0;
+                  var directionsDisplay = null;
 
 
 
@@ -192,6 +194,7 @@
                     geocoderService = new google.maps.Geocoder();
                     elevationService = new google.maps.ElevationService();
                     directionsService = new google.maps.DirectionsService();
+                    directionsDisplay = new google.maps.DirectionsRenderer();
 
                     speedData = new google.visualization.DataTable();
                     speedData.addColumn('string', 'test');
@@ -312,6 +315,7 @@
                         placeMarker(locations[i])
                       plotSavedElevation(elevations);
                     }
+                    createRoute(route, map, directionsDisplay, directionsService);
                     loadRoute(loadFromExternal);
                     loadGauge();
                     if (navigator.geolocation) {
@@ -536,6 +540,7 @@
                         for (var i in markers) {
                           latlngs.push(markers[i].getPosition())
                         }
+                        // TODO: only 8 points :-(
                         elevationService.getElevationAlongPath({
                           path: latlngs,
                           samples: SAMPLES
@@ -599,12 +604,7 @@
 
                     directionsService.route(request, function(response, status) {
                       if (status == google.maps.DirectionsStatus.OK) {
-                        for (var j=0; j<response.routes[0].legs.length; j++){
-                            totalDistance+=response.routes[0].legs[j].distance.value;
-                        }
-                        totalDistance /= 1000;
-                        console.log(totalDistance);
-                        loadDistanceGauge();
+                        // TODO: Distance wrong. Check
                         elevationService.getElevationAlongPath({
                           path: response.routes[0].overview_path,
                           samples: SAMPLES
@@ -666,18 +666,12 @@
                     if (loadFromExternal === false) {
                         reset();
                     }
-                    map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
-                    var bounds = new google.maps.LatLngBounds();
-                    for (var i = 0; i < route.length; i++) {
-                      var latlng = new google.maps.LatLng(
-                            route[i].getPosition().lat(),
-                            route[i].getPosition().lng()
-                          );
-                      addMarker(latlng, false);
-                      bounds.extend(latlng);
-                    }
 
+                    map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+
+                    // TODO: Refactor and move into routeCreator
                     if (loadFromExternal === false) {
+                        /*
                         updateElevation();
                         // Return Route
                         returnRoute.reverse();
@@ -691,6 +685,7 @@
                           bounds.extend(latlng);
                         }
                         updateReturnPathElevation();
+                        */
                     } else {
                         loadDistanceGauge();
                     }
@@ -766,7 +761,6 @@
                         localStorage.setItem('speed', JSON.stringify(sessionSpeeds));
                         localStorage.setItem('route', JSON.stringify(originalRoute));
                         localStorage.setItem('elevations', JSON.stringify(elevations));
-                        localStorage.setItem('returnElevations', JSON.stringify(returnElevations));
                         localStorage.setItem('totalDistance', JSON.stringify(totalDistance));
                     } else {
                         console.log('Sorry not available in your browser')
@@ -778,7 +772,6 @@
                         sessionSpeeds = JSON.parse(localStorage.getItem('speed'));
                         locations = JSON.parse(localStorage.getItem('route'));
                         elevations = JSON.parse(localStorage.getItem('elevations'));
-                        returnElevations = JSON.parse(localStorage.getItem('returnElevations'));
                         totalDistance = JSON.parse(localStorage.getItem('totalDistance'));
                         initSession(true);
                     } else {
