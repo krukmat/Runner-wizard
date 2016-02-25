@@ -77,7 +77,6 @@ function Tour_startUp(stopsCollection) {
                     travelMode: window.google.maps.TravelMode.WALKING
                 };
                 (function (kk) {
-                    // TODO: Add elevationService here!
                     directionsService.route(request, function (result, status) {
                         if (status == window.google.maps.DirectionsStatus.OK) {
 

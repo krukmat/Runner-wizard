@@ -516,150 +516,10 @@
                         map: map,
                       })
 
-                      google.maps.event.addListener(marker, 'dragend', function(e) {
-                        updateElevation();
-                      });
-
                       markers.push(marker);
 
-                      if (doQuery) {
-                        updateElevation();
-                      }
-
-                  }
-
-                  // Trigger the elevation query for point to point
-                  // or submit a directions request for the path between points
-                  function updateElevation() {
-                    if (markers.length > 1) {
-                      var travelMode = 'walking';
-                      if (travelMode != 'direct') {
-                        calcRoute(travelMode);
-                      } else {
-                        var latlngs = [];
-                        for (var i in markers) {
-                          latlngs.push(markers[i].getPosition())
-                        }
-                        // TODO: only 8 points :-(
-                        elevationService.getElevationAlongPath({
-                          path: latlngs,
-                          samples: SAMPLES
-                        }, plotElevation);
-                      }
-                    }
-                  }
-
-                  function updateReturnPathElevation() {
-                    if (markers.length > 1) {
-                      var travelMode = 'walking';
-                      if (travelMode != 'direct') {
-                        calcReturnRoute(travelMode);
-                      } else {
-                        var latlngs = [];
-                        for (var i in markers) {
-                          latlngs.push(markers[i].getPosition())
-                        }
-                        elevationService.getElevationAlongPath({
-                          path: latlngs,
-                          samples: SAMPLES
-                        }, plotReturnRouteElevation);
-                      }
-                    }
-                  }
 
 
-
-
-                  // Submit a directions request for the path between points and an
-                  // elevation request for the path once returned
-                  function calcRoute(travelMode) {
-                    var origin = markers[0].getPosition();
-                    var destination = markers[markers.length - 1].getPosition();
-
-                    var waypoints = [];
-                    for (var i = 1; i < markers.length - 1; i++) {
-                      waypoints.push({
-                        location: markers[i].getPosition(),
-                        stopover: true
-                      });
-                    }
-
-                    var request = {
-                      origin: origin,
-                      destination: destination,
-                      waypoints: waypoints
-                    };
-
-                    switch (travelMode) {
-                      case "bicycling":
-                        request.travelMode = google.maps.DirectionsTravelMode.BICYCLING;
-                        break;
-                      case "driving":
-                        request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
-                        break;
-                      case "walking":
-                        request.travelMode = google.maps.DirectionsTravelMode.WALKING;
-                        break;
-                    }
-
-                    directionsService.route(request, function(response, status) {
-                      if (status == google.maps.DirectionsStatus.OK) {
-                        // TODO: Distance wrong. Check
-                        elevationService.getElevationAlongPath({
-                          path: response.routes[0].overview_path,
-                          samples: SAMPLES
-                        }, plotElevation);
-                      } else if (status == google.maps.DirectionsStatus.ZERO_RESULTS) {
-                        alert("No se encuentra ruta entre estos dos puntos");
-                      } else {
-                        alert("Fallo de direcciones");
-                      }
-                    });
-                  }
-
-
-                  function calcReturnRoute(travelMode) {
-                    var origin = markers[0].getPosition();
-                    var destination = markers[markers.length - 1].getPosition();
-
-                    var waypoints = [];
-                    for (var i = 1; i < markers.length - 1; i++) {
-                      waypoints.push({
-                        location: markers[i].getPosition(),
-                        stopover: true
-                      });
-                    }
-
-                    var request = {
-                      origin: origin,
-                      destination: destination,
-                      waypoints: waypoints
-                    };
-
-                    switch (travelMode) {
-                      case "bicycling":
-                        request.travelMode = google.maps.DirectionsTravelMode.BICYCLING;
-                        break;
-                      case "driving":
-                        request.travelMode = google.maps.DirectionsTravelMode.DRIVING;
-                        break;
-                      case "walking":
-                        request.travelMode = google.maps.DirectionsTravelMode.WALKING;
-                        break;
-                    }
-
-                    directionsService.route(request, function(response, status) {
-                      if (status == google.maps.DirectionsStatus.OK) {
-                        elevationService.getElevationAlongPath({
-                          path: response.routes[0].overview_path,
-                          samples: SAMPLES
-                        }, plotReturnRouteElevation);
-                      } else if (status == google.maps.DirectionsStatus.ZERO_RESULTS) {
-                        alert("No se encuentra ruta entre estos dos puntos");
-                      } else {
-                        alert("Fallo de direcciones");
-                      }
-                    });
                   }
 
                   function loadRoute(loadFromExternal) {
@@ -669,24 +529,7 @@
 
                     map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
 
-                    // TODO: Refactor and move into routeCreator
-                    if (loadFromExternal === false) {
-                        /*
-                        updateElevation();
-                        // Return Route
-                        returnRoute.reverse();
-                        reset();
-                        bounds = new google.maps.LatLngBounds();
-                        for (var i = 0; i < returnRoute.length; i++) {
-                          var latlng = new google.maps.LatLng(
-                          returnRoute[i].getPosition().lat(),
-                          returnRoute[i].getPosition().lng());
-                          addMarker(latlng, false);
-                          bounds.extend(latlng);
-                        }
-                        updateReturnPathElevation();
-                        */
-                    } else {
+                    if (loadFromExternal === true) {
                         loadDistanceGauge();
                     }
 
