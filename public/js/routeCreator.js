@@ -3,7 +3,7 @@ function createRoute(stopsCollection, map, directionsDisplay, directionsService)
     window.tour.loadMap(map, directionsDisplay);
     window.tour.calcRoute(directionsService, directionsDisplay, stopsCollection);
     directionsDisplay.setMap(map);
-    // window.tour.fitBounds(map);
+    window.tour.fitBounds(map);
 }
 
 function Tour_startUp(stopsCollection) {

@@ -13,6 +13,9 @@
         #tabs { position: relative; }
         #speedometer { position: absolute; top: 70px; left: 840px; z-index: 99; }
         #totalDistance { position: absolute; top: 70px; left: 1040px; z-index: 99; }
+        img {
+          max-width: 100%;
+        }
     </style>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="https://maps.google.com/maps/api/js?key=AIzaSyDl9TGC98BJn4hMIHL5o7umITbXqF2YbzQ"></script>
@@ -165,7 +168,11 @@
                     var myOptions = {
                       zoom: 16,
                       center: myLatlng,
-                      mapTypeId: google.maps.MapTypeId.TERRAIN
+                      mapTypeId: google.maps.MapTypeId.TERRAIN,
+                      zoomControl: true,
+                      zoomControlOptions: {
+                        style: google.maps.ZoomControlStyle.LARGE
+                      },
                     }
                     infowindow = new google.maps.InfoWindow();
                     map = new google.maps.Map(document.getElementById("map"), myOptions);
@@ -241,6 +248,7 @@
                   }
 
                   function updatePositionOK(position) {
+                          map.setZoom(16);
                           clearMarkers();
                           cleanupRoutes();
                           setSpeed(position);
