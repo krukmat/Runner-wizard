@@ -10,8 +10,9 @@
     <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
     <style type="text/css">
         html, body { height: 100%; margin: 0; padding: 0; }
-        #speedometer { position: absolute; top: 70px; left: 10px; z-index: 99; }
-        #totalDistance { position: absolute; top: 70px; left: 120px; z-index: 99; }
+        #speedometer { position: absolute; top: 30px; left: 340px; z-index: 99; }
+        #totalDistance { position: absolute; top: 30px; left: 440px; z-index: 99; }
+        #chart_div { position: absolute; top: 180px; left: 0px; z-index: 99; width: 100%}
         img {
           max-width: 100%;
         }
@@ -155,10 +156,7 @@
                       zoom: 16,
                       center: myLatlng,
                       mapTypeId: google.maps.MapTypeId.TERRAIN,
-                      zoomControl: true,
-                      zoomControlOptions: {
-                        style: google.maps.ZoomControlStyle.LARGE
-                      },
+                      zoomControl: false,
                     }
                     infowindow = new google.maps.InfoWindow();
                     map = new google.maps.Map(document.getElementById("map"), myOptions);
@@ -179,25 +177,23 @@
                     $('#tabs-1').css('height', '320px');
                     $('#map').css('height', '100%');
                     $('#tabs-1').css('width', '100%');
-                    $('#tabs-2').css('height', '320px');
-                    $('#tabs-2').css('width', '100%');
                     $('#tabs-3').css('height', '320px');
                     $('#tabs-3').css('width', '100%');
-                    $( "#tabs" ).tabs();
+
+                    $("#tabs").tabs().css({
+                       'min-height': '500px',
+                       'overflow': 'auto'
+                    });
 
                     createMap();
 
                     chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
                     speedsChart = new google.visualization.AreaChart(document.getElementById('speeds_div'));
 
-                    var centerControlDiv = document.createElement('div');
-                    var centerControl = new BackButton(centerControlDiv, map);
                     var centerControlDiv2 = document.createElement('div');
                     var backButton = new RouteButton(centerControlDiv2, map);
 
-                    centerControlDiv.index = 1;
                     centerControlDiv2.index = 2;
-                    map.controls[google.maps.ControlPosition.TOP_LEFT].push(centerControlDiv);
                     map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv2);
 
                     geocoderService = new google.maps.Geocoder();
@@ -250,7 +246,7 @@
                   }
 
                   function updatePositionOK(position) {
-                          map.setZoom(16);
+
                           clearMarkers();
                           cleanupRoutes();
                           setSpeed(position);
@@ -260,6 +256,8 @@
                             altitude: position.coords.altitude
                           };
                            var latLong = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                           map.setCenter(latLong);
+                           map.setZoom(16);
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
                            find_closest_marker(pos);
@@ -271,45 +269,6 @@
                   function updatePosition() {
                         navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition);
                   }
-
-                  function BackButton(controlDiv, map) {
-
-                      // Set CSS for the control border.
-                      var controlUI = document.createElement('div');
-                      controlUI.style.backgroundColor = '#fff';
-                      controlUI.style.border = '2px solid #fff';
-                      controlUI.style.borderRadius = '3px';
-                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
-                      controlUI.style.cursor = 'pointer';
-                      controlUI.style.marginBottom = '22px';
-                      controlUI.style.textAlign = 'center';
-                      controlUI.title = 'Ida';
-                      controlDiv.appendChild(controlUI);
-
-                      // Set CSS for the control interior.
-                      var controlText = document.createElement('div');
-                      controlText.style.color = 'rgb(25,25,25)';
-                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-                      controlText.style.fontSize = '16px';
-                      controlText.style.lineHeight = '38px';
-                      controlText.style.paddingLeft = '10px';
-                      controlText.style.paddingRight = '10px';
-                      controlText.style.paddingBottom = '10px';
-                      controlText.style.paddingTop = '10px';
-                      controlText.innerHTML = 'Ida';
-                      controlUI.appendChild(controlText);
-
-                      // Setup the click event listeners: simply set the map to Chicago.
-                      controlUI.addEventListener('click', function() {
-                          if (ida) {
-                            controlText.innerHTML = 'Vuelta';
-                          } else {
-                            controlText.innerHTML = 'Ida';
-                          }
-                          ida = (!ida);
-                      });
-
-                    }
 
                   function geo_success(position){
                     document.title=position.coords.speed;
@@ -359,10 +318,10 @@
                       controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
                       controlText.style.fontSize = '16px';
                       controlText.style.lineHeight = '38px';
-                      controlText.style.paddingLeft = '10px';
-                      controlText.style.paddingRight = '10px';
-                      controlText.style.paddingTop = '10px';
-                      controlText.style.paddingBottom = '10px';
+                      controlText.style.paddingLeft = '5px';
+                      controlText.style.paddingRight = '5px';
+                      controlText.style.paddingTop = '5px';
+                      controlText.style.paddingBottom = '5px';
                       controlText.innerHTML = 'Route';
                       controlUI.appendChild(controlText);
 
@@ -382,13 +341,15 @@
                     }
                     sessionSpeeds.push(sessionAvgSpeed);
                     speedData.addRow(['', sessionAvgSpeed, 'color: #0000FF']);
-                    document.getElementById('speeds_div').style.display = 'block';
                     speedsChart.clearChart();
+                    document.getElementById('speeds_div').style.display = 'block';
                     speedsChart.draw(speedData, {
-                      height: '50%',
-                      width: '50%',
+                      height: '20%',
+                      width: '100%',
                       legend: 'none',
-                      titleY: 'Current Speed:'+sessionAvgSpeed,
+                      backgroundColor: { fill:'transparent' },
+                      chartArea:{width:"90%",height:"90%"},
+                      dataOpacity: 0.2,
                       focusBorderColor: '#00ff00'
                     });
                   }
@@ -445,13 +406,15 @@
 
                         }
                     }
-                    document.getElementById('chart_div').style.display = 'block';
                     chart.clearChart();
+                    document.getElementById('chart_div').style.display = 'block';
                     chart.draw(altimetryData, {
-                      height: '50%',
-                      width: '50%',
+                      height: '20%',
+                      backgroundColor: { fill:'transparent' },
+                      dataOpacity: 0.2,
                       legend: 'none',
                       titleY: 'Height',
+                      chartArea:{left:0,top:0,width:"100%",height:"90%"},
                       focusBorderColor: '#00ff00'
                     });
 
@@ -630,10 +593,21 @@
                         locations = JSON.parse(localStorage.getItem('route'));
                         elevations = JSON.parse(localStorage.getItem('elevations'));
                         totalDistance = JSON.parse(localStorage.getItem('totalDistance'));
+                        totalDistance = Math.round(totalDistance * 100) / 100;
                         initSession(true);
                     } else {
                         console.log('Sorry not available in your browser')
                     }
+                    $('#load').hide();
+                }
+
+                function idaOVuelta() {
+                  if (ida) {
+                    $('#idaOVuelta').html('Vuelta');
+                  } else {
+                    $('#idaOVuelta').html('Ida');
+                  }
+                  ida = (!ida);
                 }
     </script>
 </head>
@@ -643,23 +617,20 @@
     <div data-role="tabs">
       <div data-role="navbar">
         <ul>
-          <li><a href="#tabs-1" class="ui-btn-active">Map</a></li>
-          <li><a href="#tabs-2">Data</a></li>
-          <li><a href="#tabs-3">Session</a></li>
+          <li><a href="#tabs-1" class="ui-btn-active">Main</a></li>
+          <li><a href="#tabs-2">Extras</a></li>
         </ul>
       </div>
       <div id="tabs-1">
         <div id="map"></div>
+        <div id="chart_div"></div>
         <div id="totalDistance"></div>
         <div id="speedometer"></div>
       </div>
       <div id="tabs-2">
-        <div id="speeds_div"></div>
-        <div id="chart_div"></div>
-      </div>
-      <div id="tabs-3">
           <button id="load" onclick="load()">Load</button>
-          <button id="save" onclick="save()">Save</button>
+          <button id="idaOVuelta" onclick="idaOVuelta()">Ida</button>
+          <div id="speeds_div"></div>
       </div>
     </div>
   </div>
