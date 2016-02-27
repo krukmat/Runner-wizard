@@ -13,6 +13,7 @@
         #speedometer { position: absolute; top: 30px; left: 340px; z-index: 99; }
         #totalDistance { position: absolute; top: 30px; left: 440px; z-index: 99; }
         #chart_div { position: absolute; top: 180px; left: 0px; z-index: 99; width: 100%}
+        #speeds_div { position: absolute; top: 200px; left: 0px; z-index: 98; width: 100%}
         img {
           max-width: 100%;
         }
@@ -395,12 +396,12 @@
                     if (elevationsVar !== null) {
                         for (var i = 0; i < elevationsVar.length; i++) {
                                 if (i<closest)
-                                    altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
+                                    altimetryData.addRow(['', elevationsVar[i].elevation, '']);
                                 else{
                                     if (i> closest)
-                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #ff0000']);
+                                        altimetryData.addRow(['', elevationsVar[i].elevation, '']);
                                      else{
-                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
+                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00FF00']);
                                      }
                                 }
 
@@ -608,16 +609,21 @@
                   }
                   ida = (!ida);
                 }
+
+                function _start() {
+                  $('#navbar').hide();
+                  $('#tabs-1').show();
+                }
     </script>
 </head>
 <body>
 <div data-role="page" id="page1">
   <div role="main" class="ui-content">
     <div data-role="tabs">
-      <div data-role="navbar">
+      <div id='navbar' data-role="navbar">
         <ul>
           <li><a href="#tabs-1" class="ui-btn-active">Main</a></li>
-          <li><a href="#tabs-2">Extras</a></li>
+          <li><a href="#tabs-2">Setup</a></li>
         </ul>
       </div>
       <div id="tabs-1">
@@ -625,11 +631,13 @@
         <div id="chart_div"></div>
         <div id="totalDistance"></div>
         <div id="speedometer"></div>
+        <div id="speeds_div"></div>
       </div>
       <div id="tabs-2">
           <button id="load" onclick="load()">Load</button>
           <button id="idaOVuelta" onclick="idaOVuelta()">Ida</button>
-          <div id="speeds_div"></div>
+          <button id="start" onclick="_start()">Start</button>
+
       </div>
     </div>
   </div>
