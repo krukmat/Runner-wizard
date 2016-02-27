@@ -102,11 +102,11 @@
                   function loadDistanceGauge() {
                     var dataDistance = google.visualization.arrayToDataTable([
                       ['Label', 'Value'],
-                      ['Distance(km)', totalDistance],
+                      ['Distance(km)', parseFloat(totalDistance.toFixed(2))],
                     ]);
                     var options = {
                        width: 200, height: 100,
-                       max: totalDistance
+                       max: parseFloat(totalDistance.toFixed(2))
                     };
 
                     // TODO: configurable
@@ -345,7 +345,7 @@
                     document.getElementById('speeds_div').style.display = 'block';
                     speedsChart.draw(speedData, {
                       height: '20%',
-                      width: '100%',
+                      width: '90%',
                       legend: 'none',
                       backgroundColor: { fill:'transparent' },
                       chartArea:{width:"90%",height:"90%"},
@@ -593,7 +593,6 @@
                         locations = JSON.parse(localStorage.getItem('route'));
                         elevations = JSON.parse(localStorage.getItem('elevations'));
                         totalDistance = JSON.parse(localStorage.getItem('totalDistance'));
-                        totalDistance = Math.round(totalDistance * 100) / 100;
                         initSession(true);
                     } else {
                         console.log('Sorry not available in your browser')
