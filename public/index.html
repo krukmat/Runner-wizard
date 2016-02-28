@@ -126,7 +126,9 @@
                     if (mobileAndTabletcheck()) {
                         if (position.coords.speed !== null) {
                             // convierto de m/s a km/h => 3600/1000 = 3.6
-                            sessionAvgSpeed = position.coords.speed * 3.6;
+                            // solo asigno si la precision es suficiente
+                            if (position.coords.accuracy<=150)
+                                sessionAvgSpeed = position.coords.speed * 3.6;
                         } else {
                             sessionAvgSpeed = 0;
                         }
