@@ -6,3 +6,4 @@
 * TODO: It will allow share either routes or complete results (speed in complete route).
 * 
 **It's very useful in races with altimetry differences in all the trajectory.**
+You can check it by yourself at: https://runner-wizard.herokuapp.com
