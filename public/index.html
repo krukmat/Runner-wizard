@@ -261,14 +261,6 @@
                            google.maps.event.trigger(map, 'resize');
                   }
 
-                  function updatePosition() {
-                        navigator.geolocation.getCurrentPosition(updatePositionOK, failureGetPosition);
-                  }
-
-                  function geo_success(position){
-                    document.title=position.coords.speed;
-                  }
-
                   function initSession(loadFromExternal) {
                     createMap();
                     if (loadFromExternal === false) {
