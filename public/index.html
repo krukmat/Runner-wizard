@@ -222,10 +222,10 @@
                           map: map,
                           icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
                         });
-                      } else {
-                        mousemarker.setPosition(elevations[e.row].location);
-                        map.setCenter(elevations[e.row].location);
                       }
+                      mousemarker.setPosition(elevations[e.row].location);
+                      map.setCenter(elevations[e.row].location);
+                      chart.setSelection([{column:1,row:e.row}]);
                     });
 
 
@@ -399,10 +399,10 @@
                     if (elevationsVar !== null) {
                         for (var i = 0; i < elevationsVar.length; i++) {
                                 if (i<closest)
-                                    altimetryData.addRow(['', elevationsVar[i].elevation, '']);
+                                    altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
                                 else{
                                     if (i> closest)
-                                        altimetryData.addRow(['', elevationsVar[i].elevation, '']);
+                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #ff0000']);
                                      else{
                                         altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #000000']);
                                      }
