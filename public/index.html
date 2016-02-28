@@ -12,7 +12,7 @@
         html, body { height: 100%; margin: 0; padding: 0; }
         #speedometer { position: absolute; top: 30px; left: 340px; z-index: 99; }
         #totalDistance { position: absolute; top: 30px; left: 440px; z-index: 99; }
-        #chart_div { position: absolute; top: 100px; left: 0px; z-index: 99; width: 100%}
+        #chart_div { position: absolute; top: 80px; left: 0px; z-index: 99; width: 100%}
         #speeds_div { position: absolute; top: 130px; left: 0px; z-index: 98; width: 100%}
         img {
           max-width: 100%;
@@ -58,7 +58,7 @@
 
 
 
-                  var SAMPLES = 256;
+                  var SAMPLES = 128;
 
                   // Load the Visualization API and the piechart package.
                   google.load("visualization", "1", {packages: ["corechart", "gauge"]});
@@ -401,7 +401,7 @@
                                     if (i> closest)
                                         altimetryData.addRow(['', elevationsVar[i].elevation, '']);
                                      else{
-                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00FF00']);
+                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #000000']);
                                      }
                                 }
 
