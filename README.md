@@ -6,6 +6,6 @@
 * The session can be saved in the browser for posterior usage.
 * TODO: It will allow share either routes or complete results (speed in complete route).
 *
-* 
+* Browser app so it supports all smartphones (Android, IOS, ...)
 **It's very useful in races with altimetry differences in all the trajectory.**
 
