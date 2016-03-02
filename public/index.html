@@ -60,6 +60,7 @@
                   var centerControlDiv2;
                   var centerControlDiv;
                   var centerControlDiv3;
+                  var hideAltimetry=false, hideSpeed=false;
 
 
 
@@ -280,9 +281,12 @@
                            map.setZoom(16);
                            marker = new google.maps.Marker({position:latLong, map: map, icon: "http://maps.google.com/mapfiles/ms/icons/green-dot.png"});
                            markers.push(marker);
-                           find_closest_marker(pos);
-                           updateSpeedChart();
                            updateCheckPoints();
+                           if (!(hideAltimetry))
+                               find_closest_marker(pos);
+                           if (!(hideSpeed))
+                               updateSpeedChart();
+
                            save();
                            google.maps.event.trigger(map, 'resize');
                   }
@@ -355,6 +359,7 @@
                       // Setup the click event listeners: simply set the map to Chicago.
                       checkBox.addEventListener('click', function() {
                             console.log('check');
+                            hideSpeed = !hideSpeed;
                             if ($('#speeds_div').is(':visible'))
                                 $('#speeds_div').hide();
                             else
@@ -406,6 +411,7 @@
 
                       // Setup the click event listeners: simply set the map to Chicago.
                       checkBox.addEventListener('click', function() {
+                            hideAltimetry = !hideAltimetry;
                             console.log('check');
                             if ($('#chart_div').is(':visible'))
                                 $('#chart_div').hide();
