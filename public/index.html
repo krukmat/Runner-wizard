@@ -56,6 +56,10 @@
                   var returnElevations = null;
                   var totalDistance = 0;
                   var directionsDisplay = null;
+                  var checkPoints = [];
+                  var centerControlDiv2;
+                  var centerControlDiv;
+                  var centerControlDiv3;
 
 
 
@@ -164,6 +168,25 @@
                     }
                     infowindow = new google.maps.InfoWindow();
                     map = new google.maps.Map(document.getElementById("map"), myOptions);
+                    centerControlDiv2 = document.createElement('div');
+                    centerControlDiv = document.createElement('div');
+                    centerControlDiv3 = document.createElement('div');
+                    centerControlDiv3.style.zIndex = 999;
+
+                    var backButton = new RouteButton(centerControlDiv2, map);
+                    var speedButton = new SpeedButton(centerControlDiv, map);
+                    var altButton = new AltimetryButton(centerControlDiv3, map);
+
+                    centerControlDiv3.index = 3;
+                    centerControlDiv2.index = 2;
+                    centerControlDiv.index = 1;
+
+                    map.controls[google.maps.ControlPosition.TOP_LEFT].push(centerControlDiv);
+                    map.controls[google.maps.ControlPosition.TOP_LEFT].push(centerControlDiv3);
+                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv2);
+
+                    $(centerControlDiv).hide();
+                    $(centerControlDiv3).hide();
                   }
 
                   function initialize() {
@@ -185,12 +208,6 @@
                     chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
                     speedsChart = new google.visualization.AreaChart(document.getElementById('speeds_div'));
 
-                    var centerControlDiv2 = document.createElement('div');
-                    var backButton = new RouteButton(centerControlDiv2, map);
-
-                    centerControlDiv2.index = 2;
-                    map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv2);
-
                     geocoderService = new google.maps.Geocoder();
                     elevationService = new google.maps.ElevationService();
                     directionsService = new google.maps.DirectionsService();
@@ -207,16 +224,9 @@
                     });
 
                     google.visualization.events.addListener(chart, 'onmouseover', function(e) {
-                      if (mousemarker == null) {
-                        mousemarker = new google.maps.Marker({
-                          position: elevations[e.row].location,
-                          map: map,
-                          icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                        });
-                      }
-                      mousemarker.setPosition(elevations[e.row].location);
-                      map.setCenter(elevations[e.row].location);
-                      chart.setSelection([{column:1,row:e.row}]);
+                      // saves only the e.row
+                      if (checkPoints.indexOf(e.row) < 0)
+                          checkPoints.push(e.row);
                     });
 
 
@@ -240,6 +250,21 @@
                       handleLocationError(true, infoWindow, map.getCenter());
                   }
 
+                  function updateCheckPoints(){
+                    var mousemarker = null;
+                    var index = 0;
+                    for (var j in checkPoints) {
+                        // En el caso de vuelta seria al reves.
+                        index = checkPoints[parseInt(j)];
+                        mousemarker = new google.maps.Marker({
+                          position: elevations[index].location,
+                          map: map,
+                          icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                        });
+                        mousemarker.setPosition(elevations[index].location);
+                    }
+                  }
+
                   function updatePositionOK(position) {
 
                           clearMarkers();
@@ -257,12 +282,16 @@
                            markers.push(marker);
                            find_closest_marker(pos);
                            updateSpeedChart();
+                           updateCheckPoints();
                            save();
                            google.maps.event.trigger(map, 'resize');
                   }
 
                   function initSession(loadFromExternal) {
                     createMap();
+                    $(centerControlDiv2).hide();
+                    $(centerControlDiv).show();
+                    $(centerControlDiv3).show();
                     if (loadFromExternal === false) {
                       sessionSpeeds = [];
                     } else {
@@ -283,6 +312,107 @@
                        var infoWindow = new google.maps.InfoWindow({map: map});
                        handleLocationError(false, infoWindow, map.getCenter());
                     }
+                  }
+
+                  function SpeedButton(controlDiv, map) {
+
+                      // Set CSS for the control border.
+                      var controlUI = document.createElement('div');
+                      controlUI.style.backgroundColor = '#fff';
+                      controlUI.style.border = '2px solid #fff';
+                      controlUI.style.borderRadius = '3px';
+                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                      controlUI.style.cursor = 'pointer';
+                      controlUI.style.marginBottom = '22px';
+                      controlUI.style.textAlign = 'center';
+                      controlUI.title = 'Route';
+                      controlDiv.appendChild(controlUI);
+
+                      // checkbox
+                      var checkBox = document.createElement('input');
+                      checkBox.type = 'checkbox';
+                      checkBox.value = 'Speed'
+                      checkBox.style.color = 'rgb(25,25,25)';
+                      checkBox.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      checkBox.style.fontSize = '16px';
+                      checkBox.style.lineHeight = '38px';
+                      checkBox.style.paddingLeft = '5px';
+                      checkBox.style.paddingRight = '5px';
+                      checkBox.style.paddingTop = '5px';
+                      checkBox.style.paddingBottom = '5px';
+                      checkBox.checked = 'checked';
+                      controlUI.appendChild(checkBox);
+
+                      // Set CSS for the control interior.
+                      var controlText = document.createElement('label');
+                      controlText.style.color = 'rgb(25,25,25)';
+                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      controlText.style.fontSize = '16px';
+                      controlText.style.lineHeight = '38px';
+                      controlText.innerHTML = 'Speed';
+                      controlUI.appendChild(controlText);
+
+                      // Setup the click event listeners: simply set the map to Chicago.
+                      checkBox.addEventListener('click', function() {
+                            console.log('check');
+                            if ($('#speeds_div').is(':visible'))
+                                $('#speeds_div').hide();
+                            else
+                                $('#speeds_div').show();
+                      });
+
+                  }
+
+                  function AltimetryButton(controlDiv, map) {
+
+                      // Set CSS for the control border.
+                      var controlUI = document.createElement('div');
+                      controlUI.style.backgroundColor = '#fff';
+                      controlUI.style.border = '2px solid #fff';
+                      controlUI.style.borderRadius = '3px';
+                      controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+                      controlUI.style.cursor = 'pointer';
+                      controlUI.style.marginBottom = '22px';
+                      controlUI.style.textAlign = 'center';
+                      controlUI.title = 'Altuimetry';
+                      controlDiv.appendChild(controlUI);
+
+
+
+
+                      // checkbox
+                      var checkBox = document.createElement('input');
+                      checkBox.type = 'checkbox';
+                      checkBox.value = 'Altimetry'
+                      checkBox.checked = 'checked';
+                      checkBox.style.color = 'rgb(25,25,25)';
+                      checkBox.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      checkBox.style.fontSize = '16px';
+                      checkBox.style.lineHeight = '38px';
+                      checkBox.style.paddingLeft = '5px';
+                      checkBox.style.paddingRight = '5px';
+                      checkBox.style.paddingTop = '5px';
+                      checkBox.style.paddingBottom = '5px';
+                      controlUI.appendChild(checkBox);
+
+                      // Set CSS for the control interior.
+                      var controlText = document.createElement('label');
+                      controlText.style.color = 'rgb(25,25,25)';
+                      controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+                      controlText.style.fontSize = '16px';
+                      controlText.style.lineHeight = '38px';
+                      controlText.innerHTML = 'Altimetry';
+                      controlUI.appendChild(controlText);
+
+                      // Setup the click event listeners: simply set the map to Chicago.
+                      checkBox.addEventListener('click', function() {
+                            console.log('check');
+                            if ($('#chart_div').is(':visible'))
+                                $('#chart_div').hide();
+                            else
+                                $('#chart_div').show();
+                      });
+
                   }
 
                   function RouteButton(controlDiv, map) {
@@ -381,18 +511,36 @@
                     altimetryData.addColumn({type: 'string', role: 'style'});
                     if (elevationsVar !== null) {
                         for (var i = 0; i < elevationsVar.length; i++) {
-                                if (i<closest)
-                                    altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
-                                else{
-                                    if (i> closest)
-                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #ff0000']);
-                                     else{
-                                        altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #000000']);
-                                     }
-                                }
+                                    if (checkPoints){
+                                        if (checkPoints.indexOf(i) > -1) {
+                                              altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #0000FF']);
+                                           } else{
+                                            if (i<closest)
+                                                altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
+                                            else{
+                                                if (i> closest)
+                                                    altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #ff0000']);
+                                                 else{
+                                                    altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #000000']);
+                                                 }
+                                            }
+                                           }
+                                    } else {
+                                        if (i<closest)
+                                            altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #00ff00']);
+                                        else{
+                                            if (i> closest)
+                                                altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #ff0000']);
+                                             else{
+                                                altimetryData.addRow(['', elevationsVar[i].elevation, 'color: #000000']);
+                                             }
+                                        }
+                                    }
+                         }
 
-                        }
                     }
+
+
                     chart.clearChart();
                     document.getElementById('chart_div').style.display = 'block';
                     chart.draw(altimetryData, {
@@ -569,6 +717,7 @@
                         localStorage.setItem('route', JSON.stringify(originalRoute));
                         localStorage.setItem('elevations', JSON.stringify(elevations));
                         localStorage.setItem('totalDistance', JSON.stringify(totalDistance));
+                        localStorage.setItem('checkPoints', JSON.stringify(checkPoints));
                     } else {
                         console.log('Sorry not available in your browser')
                     }
@@ -580,6 +729,9 @@
                         locations = JSON.parse(localStorage.getItem('route'));
                         elevations = JSON.parse(localStorage.getItem('elevations'));
                         totalDistance = JSON.parse(localStorage.getItem('totalDistance'));
+                        checkPoints = JSON.parse(localStorage.getItem('checkPoints'));
+                        if (checkPoints === null)
+                          checkPoints = [];
                         initSession(true);
                     } else {
                         console.log('Sorry not available in your browser')
